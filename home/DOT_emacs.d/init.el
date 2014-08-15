@@ -47,7 +47,8 @@
         point-entered minibuffer-avoid-prompt
         face minibuffer-prompt))
 
-(xclip-mode 1)
+(when (fboundp 'xclip-mode)
+  (xclip-mode 1))
 
 (setq bookmark-save-flag 1)
 
@@ -117,11 +118,13 @@
 
 (global-set-key (kbd "C-x /") 'ace-jump-word-mode)
 
-(global-set-key (kbd "C-x |") 'fci-mode)
+(when (fboundp 'fci-mode)
+  (global-set-key (kbd "C-x |") 'fci-mode))
 
-(add-hook 'c-mode-common-hook 'fci-mode)
-(add-hook 'cperl-mode-hook 'fci-mode)
-(add-hook 'emacs-lisp-mode-hook 'fci-mode)
+(when (fboundp 'fci-mode)
+  (add-hook 'c-mode-common-hook 'fci-mode)
+  (add-hook 'cperl-mode-hook 'fci-mode)
+  (add-hook 'emacs-lisp-mode-hook 'fci-mode))
 
 (defvar iedit-toggle-key-default (kbd "C-;"))
 (define-key global-map iedit-toggle-key-default 'iedit-mode)
@@ -129,10 +132,11 @@
 (define-key esc-map iedit-toggle-key-default 'iedit-execute-last-modification)
 (define-key help-map iedit-toggle-key-default 'iedit-mode-toggle-on-function)
 
-(require 'icomplete+)
+(require 'icomplete+ nil t)
 (icomplete-mode)
 
-(global-undo-tree-mode 1)
+(when (fboundp 'global-undo-tree-mode)
+  (global-undo-tree-mode 1))
 
 (winner-mode 1)
 
@@ -245,8 +249,8 @@ removing\nany \\r characters."
        cursor-default-colour)))
 (add-hook 'post-command-hook 'cursor-overwrite-mode)
 
-(require 'winpoint)
-(winpoint-mode 1)
+(when (require 'winpoint nil t)
+  (winpoint-mode 1))
 
 (defun cursor-activate-mark ()
   "Function to call when the mark is activated."
@@ -265,30 +269,34 @@ removing\nany \\r characters."
    (grep-apply-setting 'grep-command
                        "grep --exclude='*~' --exclude='.#*' -IHn -e ")))
 
-(require 'browse-kill-ring)
-(global-set-key "\C-cy" 'browse-kill-ring)
+(when (require 'browse-kill-ring nil t)
+  (global-set-key "\C-cy" 'browse-kill-ring)
 
-;; Temporarily highlight inserted item.
-(setq browse-kill-ring-highlight-inserted-item t)
+  ;; Temporarily highlight inserted item.
+  (setq browse-kill-ring-highlight-inserted-item t)
 
-;; Highlight current choice in the kill ring buffer.
-(setq browse-kill-ring-highlight-current-entry t)
+  ;; Highlight current choice in the kill ring buffer.
+  (setq browse-kill-ring-highlight-current-entry t)
 
-;; String separating entries in the `separated' style
-(setq browse-kill-ring-separator
-      "\n--separator------------------------------")
+  ;; String separating entries in the `separated' style
+  (setq browse-kill-ring-separator
+        "\n--separator------------------------------")
 
-;; Don't allow standard navigation in kill ring buffer.
-(define-key browse-kill-ring-mode-map (kbd "<down>") 'browse-kill-ring-forward)
-(define-key browse-kill-ring-mode-map (kbd "<up>") 'browse-kill-ring-previous)
-(define-key browse-kill-ring-mode-map (kbd "<right>") 'browse-kill-ring-forward)
-(define-key browse-kill-ring-mode-map (kbd "<left>") 'browse-kill-ring-previous)
+  ;; Don't allow standard navigation in kill ring buffer.
+  (define-key browse-kill-ring-mode-map
+    (kbd "<down>") 'browse-kill-ring-forward)
+  (define-key browse-kill-ring-mode-map
+    (kbd "<up>") 'browse-kill-ring-previous)
+  (define-key browse-kill-ring-mode-map
+    (kbd "<right>") 'browse-kill-ring-forward)
+  (define-key browse-kill-ring-mode-map
+    (kbd "<left>") 'browse-kill-ring-previous)
 
-;; Face for the separator
-(defface browse-kill-ring-separator
-  '((t . (:inherit bold)))
-  "Face used for the separator in browse-kill-ring buffer")
-(setq browse-kill-ring-separator-face 'browse-kill-ring-separator)
+  ;; Face for the separator
+  (defface browse-kill-ring-separator
+    '((t . (:inherit bold)))
+    "Face used for the separator in browse-kill-ring buffer")
+  (setq browse-kill-ring-separator-face 'browse-kill-ring-separator))
 
 (if (display-graphic-p)
     (set-face-attribute 'show-paren-mismatch-face
@@ -311,8 +319,8 @@ removing\nany \\r characters."
 (global-set-key (kbd "C-c n") 'linum-mode)
 (global-set-key (kbd "C-c N") 'global-linum-mode)
 
-(require 'hlinum)
-(hlinum-activate)
+(when (require 'hlinum nil t)
+  (hlinum-activate))
 
 (setq whitespace-style '(face trailing empty))
 (global-whitespace-mode)
@@ -380,10 +388,10 @@ removing\nany \\r characters."
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
 
-(require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories
-             (concat elisp-directory "/auto-complete/dict/"))
-(ac-config-default)
+(when (require 'auto-complete-config nil t)
+  (add-to-list 'ac-dictionary-directories
+               (concat elisp-directory "/auto-complete/dict/"))
+  (ac-config-default))
 
 ;; Function for moving through the windows backwards
 (defun other-window-backward ()

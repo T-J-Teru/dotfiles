@@ -1,0 +1,635 @@
+# .bashrc
+
+#=====================================#
+#     Check for interactive shell     #
+#=====================================#
+
+case $- in
+    *i*) ;;
+    *) return ;;
+esac
+
+#======================================================#
+#     Expand directories as part of tab comletion.     #
+#======================================================#
+
+shopt -s direxpand
+
+#===================================#
+#     Source global definitions     #
+#===================================#
+
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+#======================================#
+#     flow control Ctrl-X for stop     #
+#======================================#
+
+stty stop ^X
+
+#=================#
+#     aliases     #
+#=================#
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
+
+alias ls='ls --color=auto -CF'
+alias ll='ls -loF'
+alias la='ls -loaF'
+alias lt='ls --sort=time'
+
+alias more=less
+
+alias emacs-nw='emacs -nw'
+
+
+[ -e "$HOME/.dircolors" ] && DIR_COLORS="$HOME/.dircolors"
+[ -e "$DIR_COLORS" ] || DIR_COLORS=""
+eval "`dircolors -b $DIR_COLORS`"
+
+export LESS="-S -R -i"
+
+export SHORT_HOSTNAME=$HOSTNAME
+
+export EDITOR=emacs-nw
+export PAGER=less
+export CVSEDITOR=${EDITOR}
+
+export GREP_OPTIONS="-I --exclude=*~"
+
+export LANG=en_GB
+
+export TDL_DATABASE=$HOME/.tdldb
+export TDL_LIST_COLOURS="PRI_HIGH=red"
+
+EMAIL=`git config user.email 2>/dev/null`
+if [ -z "${EMAIL}" ]
+then
+    echo "* WARNING: Expected to find '${EMAIL_FILE}' containing"
+    echo "*  an email address."
+fi
+
+export GDBVER=7.7
+export GCCVER=4.7.2
+export BINUTILSVER=2.22
+export GRAPHVIZVER=2.30.1
+export FP_GUILE_VERSION=1.8.5
+
+#====================================#
+#    For warnings during startup     #
+#====================================#
+function warning ()
+{
+  MSG=$1
+  echo -e "${COLOUR_RED}!! ${MSG}${COLOR_RESET}"
+}
+
+#======================#
+#     Colour codes     #
+#======================#
+
+# Normal colour, change the 0 to a 1 for bold.
+COLOUR_BLACK="\033[0;30m"
+COLOUR_BLUE="\033[0;34m"
+COLOUR_GREEN="\033[0;32m"
+COLOUR_CYAN="\033[0;36m"
+COLOUR_RED="\033[0;31m"
+COLOUR_PURPLE="\033[0;35m"
+COLOUR_BROWN="\033[0;33m"
+COLOUR_GREY="\033[0;37m"
+
+# Reset colour to normal foreground colour, and non bold.
+COLOUR_RESET="\033[0m"
+
+# Make text bold, normal foreground colour though.
+TEXT_BOLD="\033[1m"
+
+#==========================#
+#     Setup the prompt     #
+#==========================#
+
+# Prompt is now BOLD & BLUE
+PROMPT_COLOUR="\033[1;34m"
+
+SCRIPT_PROMPT=""
+if [ ! -z "$IN_SCRIPT" ]
+then
+  SCRIPT_PROMPT="<\[${COLOUR_RED}\]script\[${COLOUR_RESET}\]>"
+fi
+
+LOCK_DIR_PROMPT=""
+
+# Load in special git prompt support.
+source ~/.bash/git-prompt
+
+function set_prompt
+{
+    export PS1="${LOCK_DIR_PROMPT}${SCRIPT_PROMPT}[\[${COLOUR_GREEN}\]\h\[${COLOUR_RESET}\]]\[${PROMPT_COLOUR}\]\W\[${COLOUR_RESET}\]"'$(__git_ps1 " (%s)")> '
+    export PS2="\[${PROMPT_COLOUR}\]>\[${COLOUR_RESET}\] "
+}
+
+set_prompt
+
+export WINDOW_TITLE=""
+
+function prompt_command
+{
+  if [ -z "${WINDOW_TITLE}" ]
+  then
+    echo "-ne" "\033]0;`whoami`@${SHORT_HOSTNAME} ($PWD)\007"  
+  fi
+
+  # Flush the history every 10 commands.
+  test $(($HISTCMD % 10)) -eq 0 && history -w
+}
+
+export PROMPT_COMMAND=prompt_command
+
+# Allow the window title to be changed. Either manually to a 
+# fixed string, or change everytime we switch directories.
+function xtitle
+{
+  if [ "$TERM" = "xterm" ]
+  then
+
+    if [ "$1" == "" ]
+    then
+	WINDOW_TITLE=""
+    else
+        echo -ne "\033]0;$1\007"
+	WINDOW_TITLE=$1
+    fi
+  fi
+}
+
+# Change to default, auto-updating, window title.
+xtitle ""
+
+#==============#
+#     path     #
+#==============#
+
+export MANPATH=${MANPATH}
+export INFOPATH=$INFOPATH
+export PATH=$HOME/bin:$HOME/.software/bin:$PATH
+
+#==================================================#
+#     Stuff for looking at the command history     #
+#==================================================#
+
+# Find all commands in my history that match a regexp.
+function prev
+{
+  local REGEXP=$1
+  local COUNT=$2
+
+  # If regexp is numeric, but count is not, then
+  # maybe the user has the arguments the wrong
+  # way round. - Slap their ass and reverse the args
+  function numeric
+  {
+    echo $1 | perl -e "if (<> =~ m/^\d+$/) {  exit 0; } exit 1;"
+    if [ $? = 0 ]
+    then
+      echo "Number"
+    else
+      echo "Non-Number"
+    fi
+  }
+
+  local s1=`numeric $REGEXP`
+  local s2=`numeric $COUNT`
+
+  if [ "$s1" == "Number" ]
+  then
+    if [ "$s2" != "Number" ]
+    then
+      local temp=${REGEXP}
+      REGEXP=${COUNT}
+     COUNT=${temp}
+    fi
+  fi
+  # Function that actually _does_
+  # the history search.
+  function prev_guts
+  {
+      # 24/8/05: Used to use HISTSIZE which tells use how many lines there
+      # are max in the history, but on some dumbass machines asking for more
+      # lines than are actually in the history causes an error, so instead I
+      # count how many lines are in the history, and then filter.
+      # This would probably be better done without using fc at all not, but
+      # I'm currently busy...
+      local SIZE=`history | wc -l | tr -d " " 2>/dev/null`
+
+      fc -ln -`expr $SIZE - 1` |  \
+          perl -e "while (<>) { s/^\s+//; print if (m#${REGEXP}#); }"
+  }
+
+  # No regexp, defaults to _all_ history
+  if [ "$REGEXP" == "" ]
+  then
+    REGEXP='.*'
+  fi
+
+  # Now do the search, truncating by count if required.
+  if [ "$COUNT" == "" ]
+  then
+      prev_guts
+  else
+      prev_guts | tail -n $COUNT
+  fi
+}
+
+# A command that will show me the last command that I executed.
+alias lc="fc -ln -1 2>/dev/null | perl -pe 's/^\s+//'"
+
+# Find the last command in my history that begins with some regexp.
+function show-command
+{
+  local REGEXP=$1
+
+  if [ ${REGEXP::1} != "^" ]
+  then
+      REGEXP="^$REGEXP"
+  fi
+
+  prev $REGEXP 1
+};
+alias sc='show-command'
+
+#=====================================#
+#     Special cd/bt functionality     #
+#=====================================#
+function custom-cd ()
+{
+  local show_pwd="N"
+
+  local prevTen=`fc -ln -10 2>/dev/null | egrep -c " +cd"`;
+  if [[ $prevTen -eq 0 ]]; 
+  then 
+    show_pwd="Y"
+  fi
+
+  if [[ -z $@ ]]
+  then
+    builtin pushd $HOME >/dev/null 2>&1;
+  else
+    for dir in "$@"
+    do
+      if [[ -d $dir ]]
+      then
+        builtin pushd "$dir" >/dev/null 2>&1;
+      else
+        if [ $dir = "-" ]
+        then
+          local target=`dirs -l +1 2>/dev/null`
+          popd +1  >/dev/null 2>&1
+          builtin pushd "$target"  >/dev/null 2>&1
+          show_pwd="Y"
+        elif [[ ${dir:0:2} = ".." && ${#dir} > 2 ]]
+        then
+          echo ${dir} | grep -e '^\.*$' >/dev/null 2>/dev/null
+          if [ $? == 0 ]
+          then
+            # This matches the pattern "\.\.\.+", so lets move 
+            # backwards up the dir tree by the (length($dir) - 2)
+            # Record where we start.
+            local initial_dir=${PWD}
+
+            # Figure out where we're going to end up.
+            for I in `seq 2 ${#dir}`
+            do
+              builtin cd ..
+            done
+            
+            # Record where we end up.
+            local final_dir=${PWD}
+
+            # Move back to the starting position
+            builtin cd ${initial_dir}
+
+            # And jump to the destination, adding to the stack.
+            builtin pushd ${final_dir} >/dev/null 2>&1
+
+            # Lets show folk where they ended up
+            show_pwd="Y"
+          fi
+        else
+          echo "Unknown directory: $dir"
+          return 1
+        fi
+      fi
+    done
+  fi
+
+  if [[ ! -z "${CD_PLEASE_BE_SILENT}" ]]
+  then
+    show_pwd="N"
+  fi
+
+  if [ ! -t 1 ]
+  then
+      show_pwd="N"
+  fi
+
+  if [[ "$show_pwd" == "Y" ]]; then pwd; fi;
+  return 0
+}
+
+function bt()
+{
+  OPTERR=0
+
+  while getopts "rcm:M:hp" ARGUMENT
+  do
+    # -r: Reverse the list of directories
+    if [ $ARGUMENT = "r" ]
+    then
+      echo "Reversing is not supported yet!"
+      return 1
+    fi
+
+    # -c: Clears the list of previous directories
+    if [ $ARGUMENT = "c" ]
+    then
+      dirs -c
+      return 0
+    fi
+
+    # -m <pattern>: List directories matching pattern
+    if [ $ARGUMENT = "m" ]
+    then
+      dirs -v | egrep $OPTARG
+      return 0
+    fi
+
+    # -M <pattern>: As -m, but case insensitive.
+    if [ $ARGUMENT = "M" ]
+    then
+      dirs -v | egrep -i $OPTARG
+      return 0
+    fi
+
+    # -h parameter, provide some help
+    if [ $ARGUMENT = "h" ]
+    then
+      echo "bt [-p|-r|-c|-h|-m <pattern>|-M <pattern>|<num>]"
+      return 0
+    fi
+
+    # -p
+    if [ $ARGUMENT = "p" ]
+    then
+      dirs -v
+      return 0
+    fi
+  done
+
+  # No options given, use the command line
+  # number, or return the list.
+  if [[ -z "$@" ]]
+  then
+    # Limit to at most 20 entries.
+    dirs -v | perl -ne 'chomp; if (($. % 2) == 0) { print "\033[1m"; }  print $_,"\033[0m\n"' | head -n 20
+  else
+    # Check that $1 is a number
+    local target=`dirs -l +$1 2>/dev/null`
+    if [ ! -z "${target}" ]
+    then
+      custom-cd "${target}"
+      return 0
+    else
+      echo "Invalid index: $1"
+      return 1
+    fi
+  fi
+}
+
+function dir-locked()
+{
+  echo "Directory is currently locked at $PWD"
+  echo "Use 'unlockdir' to change directory again."
+}
+
+alias cd='custom-cd'
+
+function lockdir()
+{
+  alias cd='dir-locked';
+
+  export LOCK_DIR_PROMPT="<\[${COLOUR_RED}\]Locked\[${COLOUR_RESET}\]>"
+  set_prompt
+}
+
+function unlockdir()
+{
+  alias cd='custom-cd';
+
+  export LOCK_DIR_PROMPT=""
+  set_prompt
+}
+
+#=================================#
+#     Simple version of watch     #
+#=================================#
+
+function monitor
+{
+  watch --interval=1 $@
+}
+
+#====================#
+#     Pretty PWD     #
+#====================#
+# Take a string which could really be anything, but add the strings
+# required for bash to add colour to it. Allows paths to take a 
+# uniform colour.
+function colourize_path
+{
+  local PATH_TO_MANGLE=$1
+  echo "${COLOUR_PURPLE}$PATH_TO_MANGLE${COLOUR_RESET}"
+}
+
+# Make PWDs stand out so we can see where we've been.
+function pretty_pwd
+{
+    if [ -t 1 ]
+    then
+        echo -e PWD: `colourize_path ${PWD}`
+    else
+        builtin pwd
+    fi
+}
+alias pwd='pretty_pwd'
+
+
+#======================================#
+#     Add support for upto command     #
+#======================================#
+
+function upto()
+{
+  local PATTERN=$1
+
+  if [ -z ${PATTERN} ]
+  then
+    echo "** No pattern supplied to upto!!"
+    return 1
+  fi
+
+  local WORKER=$HOME/bin/upto_core.pl
+
+  if [ ! -e ${WORKER} ]
+  then
+      echo -e "Failed to find the worker script: `colourize_path \"${WORKER}\"`"
+      return 1
+  fi
+
+  DEST=`${WORKER} "${PATTERN}" "${PWD}"`
+
+  # We get the empty 
+  if [ -z ${DEST} ]
+  then
+    echo -e "!! Pattern not found: '${PATTERN}'";
+    DEST=${PWD}
+  fi
+
+  if [ "${DEST}" != "${PWD}" ]
+  then
+    # Give a suitable message, and change to the new directory
+    local DIR="${DEST}"
+    echo -e "Jumping to: `colourize_path \"${DIR}\"`"
+    CD_PLEASE_BE_SILENT=y cd ${DEST}
+  else
+    # Saves pushing needless directories onto the cd stack.
+    local DIR="${PWD}"
+    echo -e "Remaining in: `colourize_path \"${DIR}\"`"
+  fi
+}
+
+# Mmmm, lazy boy.
+alias jmp='upto'
+
+#=============================================================#
+# An escape command for when I'm stuck in a deleted directory #
+#=============================================================#
+
+# Due to the use of my custom-cd function, if I'm in a
+# directory that gets deleted then trying to cd out of it will 
+# not work, bah!  This escape function gets we to the closest
+# ancestor directory that still exists.
+
+function escape ()
+{
+    ORIG=$PWD
+    ORIG_TO_PRINT=$PWD
+
+    builtin cd /
+
+    while [ ! -d $ORIG ]
+    do
+        ORIG=`dirname $ORIG`
+    done
+
+    if [ "x$ORIG" == "x$ORIG_TO_PRINT" ]
+    then
+        echo -e "Reacquired: `colourize_path \"$ORIG_TO_PRINT\"`"
+    else
+        echo -e "Was in: `colourize_path \"$ORIG_TO_PRINT\"`"
+        echo -e "Now in: `colourize_path \"$ORIG\"`"
+    fi
+
+    builtin cd $ORIG
+}
+
+#=========================================#
+#       pgrep for my processes only       #
+#=========================================#
+
+function pgrep-me ()
+{
+    pgrep -U ${LOGNAME} $@
+}
+
+#=========================================#
+#     Some sanity checks and warnings     #
+#=========================================#
+
+function tool_check ()
+{
+  TOOL=$1
+
+  if [ "$(type -t ${TOOL})" == "" ]
+  then
+    warning "Missing command $TOOL"
+  fi
+}
+
+#====================================================#
+#     Configure the history into different files     #
+#====================================================#
+
+HISTSIZE=32768	     # save this many lines in the run-time history
+unset HISTFILESIZE	     # no maximum size of history file
+HISTFILE=$HOME/.hist/`uname -n`/$$
+[ -d $(dirname ${HISTFILE}) ] || mkdir $(dirname ${HISTFILE})
+touch $HISTFILE
+LAST_CWD=$PWD
+mkdir -p `dirname $HISTFILE`
+HISTCONTROL=ignoredups     # don't save history identical to previous lines
+shopt -u histappend        # overwrite HISTFILE on exit instead of appending
+unset IGNOREEOF	     # ctrl-d will kill the shell
+unset TMOUT		     # no timed auto-logout
+unset MAILCHECK
+command_oriented_history=1 # save multi-line commands as a single line
+set -o emacs		     # Emacs-style readline
+set -o physical	     # do not follow symlinks when changing current dir
+shopt -s checkwinsize      # check window after each cmd, update LINES/COLUMNS
+
+# find things in previous history ( most recent 5 history files only )
+function histfind ()
+{
+  n=5
+  grep -rl -- "$1" ~/.hist | xargs ls -1tr \
+    | tail -$n | xargs grep --color=always -- "$1" /dev/null | uniq
+}
+
+#========================================#
+#     bash completion for git and ct     #
+#========================================#
+
+if [ -f ~/.bash/git-completion ]
+then
+    source ~/.bash/git-completion
+fi
+
+if [ -f ~/.bash/ct-ng.comp ]
+then
+    source ~/.bash/ct-ng.comp
+fi
+
+#===============================#
+#     Starting VNC sessions     #
+#===============================#
+
+# start a VNC server, reducing the dimensions to allow a Windoze taskbar to sit
+# underneath.  USAGE: vnc <screen-geom> <window-manager>
+function vnc() 
+{
+  geom=$1;
+  wm=$2
+
+  case $geom in
+    [0-9]*x[0-9]*)
+      w=`echo $geom | sed 's/x.*$//'`
+      h=`echo $geom | sed 's/^.*x//'`
+      new_geom=$(($w - 10))x$(($h - 60))
+      ;;
+    *) echo "bad geometry $geom"; return 1;;
+  esac
+  env LD_LIBRARY_PATH= OSS_DONT_SET_LDPATH=yes VNCVER=OS \
+        /tools/bin/vncserver -geometry $new_geom -depth 24 -name "`uname -n` `id -un` $wm"
+}

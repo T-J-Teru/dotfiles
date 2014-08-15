@@ -1,0 +1,676 @@
+#+PROPERTY: tangle yes
+#+PROPERTY: tangle-file init.el
+
+* General Configuration
+** Splash Screen
+   Turn off the splash screen.
+   #+BEGIN_SRC emacs-lisp
+     (setq inhibit-splash-screen t)
+   #+END_SRC
+** Setup Default And Initial Frame Parameters
+   Default frame parameters.  These will also apply to the initial
+   frame unless they are overridden in =initial-frame-alist=.
+   #+BEGIN_SRC emacs-lisp
+     (setq default-frame-alist
+	   `(;; menu-bar-lines and tool-bar-lines are how old
+	     ;; versions of emacs (before 24) initialised the
+	     ;; menu & tool bars.  Now we just check the
+	     ;; values of menu-bar-mode and tool-bar-mode.
+	     (menu-bar-lines . 0)
+	     (tool-bar-lines . 0)))
+   #+END_SRC
+   Turn off the scroll bar, we have the position in file displayed for us
+   already, and the mouse wheel works fine for scrolling through the file.
+   #+BEGIN_SRC emacs-lisp
+     (set-scroll-bar-mode nil)
+   #+END_SRC
+
+** Loading Global Initialisation
+   Don't load the global configuration.  Anything that's in the global
+   configuration that I want I'll place in my own configuration anyway, and
+   often the distributions will add configuration setting that I don't
+   want, and as the global configuration is loaded after mine, then my
+   settings get corrupted.
+   #+BEGIN_SRC emacs-lisp
+     (setq inhibit-default-init t)
+   #+END_SRC
+** Frame Title
+   This sets the frame title to contain the full filename if we're visiting
+   a file in the current buffer, or to the buffer name if we're not
+   visiting a file.
+   #+BEGIN_SRC emacs-lisp
+     (setq frame-title-format
+           (list '(using-xemacs
+                  "xemacs: "
+                  "emacs: ")
+                 '(buffer-file-name
+                  "%f"
+                  (dired-directory dired-directory "%b"))))
+   #+END_SRC
+** Emacs Package System And Load Path
+*** Built-in Package System
+    First, where are we going to get packages from.
+    #+BEGIN_SRC emacs-lisp
+      (setq package-archives
+            '(("org" . "http://orgmode.org/elpa/")
+              ("gnu" . "http://elpa.gnu.org/packages/")
+              ("marmalade" . "http://marmalade-repo.org/packages/")
+              ("melpa" . "http://melpa.milkbox.net/packages/")))
+    #+END_SRC
+    Now, arrange to load the packages immediately.
+    #+BEGIN_SRC emacs-lisp
+      (setq package-enable-at-startup nil)
+      (package-initialize)
+    #+END_SRC
+*** Random Other Packages
+    There are packages I'd like to use that are not in any of the
+    archives that I use.  I download these myself and place them into
+    my local packages directory.
+    This code extends the =load-path= so that the packages can be found.
+    #+BEGIN_SRC emacs-lisp
+      (defconst elisp-directory (expand-file-name "~/.emacs.d/"))
+      (add-to-list 'load-path (concat elisp-directory "/packages"))
+      (add-to-list 'load-path (concat elisp-directory "/my-elisp"))
+    #+END_SRC
+** Buffer Switching
+   Use =ibuffer= rather than =list-buffers= for buffer switching.
+   First turn it on, and arrange for line highlighting to be turned on
+   in the buffer selection buffer.
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-x C-b") 'ibuffer)
+     (add-hook 'ibuffer-mode-hook (lambda ()
+                                    (hl-line-mode 1)
+                                    (ibuffer-auto-mode)))
+   #+END_SRC
+** Mode Line Configuration.
+   Turn on column and line numbers in the mode line.
+   #+BEGIN_SRC emacs-lisp
+     (setq line-number-mode t)
+     (setq column-number-mode t)
+   #+END_SRC
+** Mini-Buffer
+   Don't let the point enter the text of the mini-buffer prompt, keep the
+   prompt text as read-only.
+   #+BEGIN_SRC emacs-lisp
+     (setq minibuffer-prompt-properties
+           '(read-only t
+             point-entered minibuffer-avoid-prompt
+             face minibuffer-prompt))
+   #+END_SRC
+** Kill 'n' Yank In Terminals
+   This provides access to the x-clipboard from the terminal, allowing
+   kill and yank operations to work either between terminal windows,
+   or between X windows and the terminal.
+   #+BEGIN_SRC emacs-lisp
+     (xclip-mode 1)
+   #+END_SRC
+** Bookmarks
+   Save bookmarks whenever I change one.
+   #+BEGIN_SRC emacs-lisp
+     (setq bookmark-save-flag 1)
+   #+END_SRC
+** Highlight Selection
+   This causes the selection to be highlighted.
+   #+BEGIN_SRC emacs-lisp
+     (transient-mark-mode t)
+   #+END_SRC
+** Indenting
+   Don't insert tabs when indenting.
+   #+BEGIN_SRC emacs-lisp
+     (set-default `indent-tabs-mode nil)
+   #+END_SRC
+** Overwrite Current Selection
+   Typing when the region is active will replace the current region.
+   #+BEGIN_SRC emacs-lisp
+     (delete-selection-mode t)
+   #+END_SRC
+** Mouse Cursor Control
+*** Move Away From Point
+    Have the cursor move away from point.  This doesn't do much on my
+    laptop, where the cursor /goes invisible/ when I'm typing, then
+    doesn't seem to move.  Should investigate to see if this ever does
+    anything.
+    #+BEGIN_SRC emacs-lisp
+      (if (display-graphic-p)
+          (mouse-avoidance-mode 'cat-and-mouse))
+
+    #+END_SRC
+** Make Scripts Executable
+   When we save a script try to make it executable.  Currently this
+   only works for files ending in =.pl= or =.sh=, but it would be quite
+   nice to extend this to spot files that have a =#!= as the first 2
+   characters.
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'after-save-hook
+        '(lambda ()
+           (let ( (temp (substring buffer-file-name -3)) )
+             (if (or (equal temp ".pl")
+                     (equal temp ".sh"))
+                 (executable-make-buffer-file-executable-if-script-p)))))
+   #+END_SRC
+** Disabled Commands
+   These commands are disabled by default, but are actually useful.
+   #+BEGIN_SRC emacs-lisp
+     (put 'narrow-to-region 'disabled nil)
+     (put 'upcase-region 'disabled nil)
+     (put 'downcase-region 'disabled nil)
+   #+END_SRC
+* Setup Autoloads
+  #+BEGIN_SRC emacs-lisp
+    (autoload 'r-mode "ess-site")
+    (autoload 'javascript-mode "javascript" nil t)
+    (autoload 'forth-mode "gforth")
+
+    (autoload 'andrew-cperl-mode "andrew-cperl-mode")
+    (autoload 'andrew-cc-mode "andrew-cc-mode")
+    (autoload 'jump-to-matching-paren "mparen")
+    (autoload 'toggle-menubar-and-toolbar "menu-toggle")
+  #+END_SRC
+* Setup Auto Mode Alist
+  #+BEGIN_SRC emacs-lisp
+    ;; I create gdb command scripts as *.gdb
+    (add-to-list 'auto-mode-alist '("\\.gdb\\'" . gdb-script-mode))
+    ;; Take care of supporting R mode.
+    (add-to-list 'auto-mode-alist '("\\.R\\'" . r-mode))
+    ;; Javascript support.
+    (add-to-list 'auto-mode-alist (cons  "\\.js\\'" 'javascript-mode))
+    ;; Lots of different extensions for FORTH
+    (add-to-list 'auto-mode-alist '("\\.of\\'"  . forth-mode))
+    (add-to-list 'auto-mode-alist '("\\.fs\\'"  . forth-mode))
+    (add-to-list 'auto-mode-alist '("\\.fs\\'"  . forth-mode))
+    (add-to-list 'auto-mode-alist '("\\.fth\\'" . forth-mode))
+    ;; Org Mode
+    (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+    ;; Ensure we use cperl-mode not perl-mode
+    (mapc
+     (lambda (pair)
+       (if (eq (cdr pair) 'perl-mode)
+           (setcdr pair 'cperl-mode)))
+     (append auto-mode-alist interpreter-mode-alist))
+  #+END_SRC
+* Package Configuration
+** Require Some Packages
+   Should revisit this to see if I really need to require the packages
+   at this point, or if I could setup some autoloads, and load the
+   files later.
+   #+BEGIN_SRC emacs-lisp
+     ;; Allow blocks to be hidden / shown on demand.
+     (require 'hideshow)
+     ;; For doing haskell - will fail silently if haskell mode is not available on
+     ;; the machine that this emacs is being run on.
+     (require 'haskell-mode nil t)
+     ;; Linker script mode.
+     (require 'ld-script)
+   #+END_SRC
+** ACE Navigation
+   The ace navigation system is a pretty neat way of jumping around within
+   the visible area of a buffer.
+   First, create a new keymap that I'll bind to C-x C-a, this is going to
+   be where all the ace navigation commands will get added.
+   #+BEGIN_SRC emacs-lisp
+     (setq ctl-x-a-map (make-sparse-keymap))
+     (define-key ctl-x-map "\C-a" ctl-x-a-map)
+   #+END_SRC
+   Now add the ace navigation commands into the keymap.
+   #+BEGIN_SRC emacs-lisp
+     (define-key ctl-x-a-map "j" 'ace-jump-word-mode)
+     (define-key ctl-x-a-map "J" 'ace-jump-char-mode)
+     (define-key ctl-x-a-map "o" 'ace-window)
+   #+END_SRC
+   And because the =ace-jump-word-mode= is just so useful, find an even
+   shorter keymap for that action.  I think that I should possibly delete
+   this and train my fingers to use the "C-x C-a j" binding instead.
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-x /") 'ace-jump-word-mode)
+   #+END_SRC
+** Fill Column Indictator
+   This package draws a faint marker down the right hand side, indicating
+   where the fill column is.  First, add a key-binding to toggle the
+   marker.
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-x |") 'fci-mode)
+   #+END_SRC
+   Now turn the mode on by default in a set of common language modes.
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'c-mode-common-hook 'fci-mode)
+     (add-hook 'cperl-mode-hook 'fci-mode)
+     (add-hook 'emacs-lisp-mode-hook 'fci-mode)
+   #+END_SRC
+** =iedit= mode
+   This is lifted from the =iedit.el= file.  The autoloads for iedit
+   don't setup the default keybinding.  The choices then are either
+   fully load iedit now, or setup the default keybinding myself.  I
+   choose the later to reduce load time.
+   #+BEGIN_SRC emacs-lisp
+     (defvar iedit-toggle-key-default (kbd "C-;"))
+     (define-key global-map iedit-toggle-key-default 'iedit-mode)
+     (define-key isearch-mode-map iedit-toggle-key-default 'iedit-mode-from-isearch)
+     (define-key esc-map iedit-toggle-key-default 'iedit-execute-last-modification)
+     (define-key help-map iedit-toggle-key-default 'iedit-mode-toggle-on-function)
+   #+END_SRC
+** =icomplete+= mode
+   With =icomplete-mode= we get completion suggestions in the
+   mini-buffer.  The =icomplete+= provides some small improvements on
+   top.
+   #+BEGIN_SRC emacs-lisp
+     (require 'icomplete+)
+     (icomplete-mode)
+   #+END_SRC
+** Undo Tree
+   Easy undo navigation.
+   #+BEGIN_SRC emacs-lisp
+     (global-undo-tree-mode 1)
+   #+END_SRC
+** Window Configuration Undo Mode
+   This provides a simple undo / redo mechanism for the window
+   configuration, though sadly the redo is not as good as the undo.
+   Would be nice, one day, to try and improve this so that the undo
+   and redo are equally as powerful.
+   #+BEGIN_SRC emacs-lisp
+     (winner-mode 1)
+   #+END_SRC
+** Improved Rectangle Selection With CUA
+   The =cua-mode= stuff, in general, is not to my taste, that's the
+   Ctrl-x, Ctrl-c, Ctrl-v, for cut, copy, paste.  However, the
+   rectangle selection stuff is pretty great.  Luckily we can have
+   the rectangle stuff without the reset.
+   #+BEGIN_SRC emacs-lisp
+     (cua-selection-mode 1)
+   #+END_SRC
+** Diff Mode
+   Make diff mode a little more git friendly.  I find it hard to
+   believe that I'm the only person to want this, so I assume there's
+   a better way to get this functionality, should figure out what that
+   is and use that instead.
+   #+BEGIN_SRC emacs-lisp
+     (defun andrew-configure-diff-mode ()
+       (font-lock-add-keywords
+        nil
+        '(("^index \\(.+\\).*\n"
+           (0 diff-header-face) (1 diff-index-face prepend))
+          ("^diff --git \\(.+\\).*\n"
+           (0 diff-header-face) (1 diff-file-header-face prepend))
+          ))
+       )
+
+     (add-hook 'diff-mode-hook 'andrew-configure-diff-mode)
+   #+END_SRC
+** Forth Mode
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'forth-mode-hook
+               '(lambda ()
+                  (setq forth-indent-level 2)
+                  (setq forth-minor-indent-level 1)
+                  (setq forth-custom-words
+                        '((("QT\"")
+                           compile-only
+                           (font-lock-string-face . 1)
+                           "[\"\n]" nil string
+                           (font-lock-string-face . 1))))))
+   #+END_SRC
+** Javascript Mode
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'javascript-mode-hook
+               '(lambda () (setq js-indent-level 2)))
+   #+END_SRC
+** Latex Mode
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'latex-mode-hook
+               '(lambda ()
+                  (auto-fill-mode 1)
+                  (flyspell-mode 1)
+                  (setq LaTeX-figure-label "figure:")
+                  (setq LaTeX-table-label "table:")))
+   #+END_SRC
+** Spell Checking
+   #+BEGIN_SRC emacs-lisp
+     ;; Set up the spell checker to use.
+     ;; Thve alternative is ispell - but aspell gives better suggestions.
+     (setq-default ispell-program-name "aspell")
+     ;;
+     ;; Make sure that we pick up the correct dictionary name.
+     ;; In truth only the ispell-dictionary needs to be set, but
+     ;; it is nice to set them both just to be on the safe side.
+     ;;
+     (if (string-equal ispell-program-name "aspell")
+       ;; aspell has 'british' dictionary.
+       (progn (setq flyspell-default-dictionary "british")
+              (setq ispell-dictionary "british"))
+       ;;
+       ;; ispell calls it an english dictionary.
+       (progn (setq flyspell-default-dictionary "english")
+              (setq ispell-dictionary "english")))
+
+     (require 'andrew-ispell)
+   #+END_SRC
+** Configure Perl
+   #+BEGIN_SRC emacs-lisp
+     ;; A bug in emacs 24 causes the following line to be needed.
+     ;; Would be nice to remove this one day.
+     (if (>= emacs-major-version 24)
+         (progn
+           (defvar cperl-invalid-face nil)
+           (setq cperl-highlight-variables-indiscriminately 't)))
+
+     ;; Now load my cperl customisations when entering cperl-mode.
+     (add-hook 'cperl-mode-hook 'andrew-cperl-mode)
+   #+END_SRC
+** Configure C and C++
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'c-mode-hook 'andrew-cc-mode)
+     (add-hook 'c++-mode-hook 'andrew-cc-mode)
+   #+END_SRC
+* Other
+** Simple Helper Functions
+*** Detect xemacs
+    I don't use xemacs much anymore, but there was a time when I did,
+    and it was nice to have a helper function to detect it.
+    #+BEGIN_SRC emacs-lisp
+      (defun using-xemacs ()
+        (string-match "XEmacs\\|Lucid" emacs-version))
+    #+END_SRC
+*** Convert DOS Format To Unix
+    This converts dos format files to unix format files.  I'm pretty
+    sure there's a /better/ way to do this using the file encoding,
+    however, I've had this helper around forever, and I still use if
+    from time to time.  I should figure out what the built-in way is
+    and use that instead.
+    #+BEGIN_SRC emacs-lisp
+      (defun dos2unix ()
+        "Convert dos formatted buffer to unix formatted buffer by
+      removing\nany \\r characters."
+        (interactive)
+        (let ((current-point-position (point)))
+          (progn
+            (message "dos2unix: Converting dos characters '\r' to ''")
+            (goto-char (point-min))
+            (while (search-forward "\r" nil t) (replace-match ""))
+            (goto-char current-point-position)))
+            (message "dos2unix: done."))
+    #+END_SRC
+** Parentheses Highlighting
+   #+BEGIN_SRC emacs-lisp
+     (show-paren-mode t)
+     (if (display-graphic-p)
+         (setq show-paren-style 'expression)
+       (setq show-paren-style 'parenthesis))
+       #+END_SRC
+** Truncate Lines
+   Turn on truncate lines, lines will extend off the right side of the
+   screen rather than wrapping onto the line below.
+   #+BEGIN_SRC emacs-lisp
+     (set-default `truncate-lines t)
+
+     (defun toggle-truncate-lines ()
+       "Toggle value of truncate-lines and refresh window display."
+       (interactive)
+       (setq truncate-lines (not truncate-lines))
+       ;; now refresh window display (an idiom from simple.el):
+       (save-excursion
+         (set-window-start (selected-window)
+                           (window-start (selected-window)))))
+   #+END_SRC
+** Cursor Tweaks
+*** Change Colour For Overwrite Mode
+    When we enter overwrite mode, change the cursor colour.
+    #+BEGIN_SRC emacs-lisp
+      (defvar cursor-default-colour "LimeGreen")
+      (defvar cursor-overwrite-colour "red")
+
+      (defun cursor-overwrite-mode ()
+        "Set cursor colour according to insert mode"
+        (set-cursor-color
+         (if overwrite-mode
+             cursor-overwrite-colour
+             cursor-default-colour)))
+      (add-hook 'post-command-hook 'cursor-overwrite-mode)
+    #+END_SRC
+*** Remember Position Per Window
+    #+BEGIN_SRC emacs-lisp
+      (require 'winpoint)
+      (winpoint-mode 1)
+    #+END_SRC
+*** Change Shape When Mark Is Set
+    When the mark is set change the shape of the cursor.  This is
+    nice, but can sometimes break, leaving the cursor in the wrong
+    shape.  This depends on the hooks being triggered, sadly, in some
+    places the underlying variable is accessed directly, without going
+    through the API that causes the hook to fire.  One prime example
+    is in =c-mode= where the electric parentheses code will cause the
+    activate mark hook to fire when it should not, without a matching
+    call to deactivate mark.  Still, the following works more than it
+    does not, so I prefer to keep it around.
+    #+BEGIN_SRC emacs-lisp
+      (defun cursor-activate-mark ()
+        "Function to call when the mark is activated."
+        (progn
+          (setq cursor-type 'bar)))
+      (add-hook 'activate-mark-hook 'cursor-activate-mark)
+
+      (defun cursor-deactivate-mark ()
+        "Function to call when the mark is deactivated."
+        (progn
+          (setq cursor-type 'box)))
+      (add-hook 'deactivate-mark-hook 'cursor-deactivate-mark)
+    #+END_SRC
+** Improved =grep= settings
+   This makes grep ignore some obvious things by default.
+   #+BEGIN_SRC emacs-lisp
+     (eval-after-load "grep"
+       (lambda ()
+        (grep-apply-setting 'grep-command
+                            "grep --exclude='*~' --exclude='.#*' -IHn -e ")))
+   #+END_SRC
+** Setup Browse Kill Ring
+   The =browse-kill-ring= package displays the kill ring in a buffer allowing
+   entries to be viewed and selected.
+   #+BEGIN_SRC emacs-lisp
+     (require 'browse-kill-ring)
+     (global-set-key "\C-cy" 'browse-kill-ring)
+
+     ;; Temporarily highlight inserted item.
+     (setq browse-kill-ring-highlight-inserted-item t)
+
+     ;; Highlight current choice in the kill ring buffer.
+     (setq browse-kill-ring-highlight-current-entry t)
+
+     ;; String separating entries in the `separated' style
+     (setq browse-kill-ring-separator
+           "\n--separator------------------------------")
+
+     ;; Don't allow standard navigation in kill ring buffer.
+     (define-key browse-kill-ring-mode-map (kbd "<down>") 'browse-kill-ring-forward)
+     (define-key browse-kill-ring-mode-map (kbd "<up>") 'browse-kill-ring-previous)
+     (define-key browse-kill-ring-mode-map (kbd "<right>") 'browse-kill-ring-forward)
+     (define-key browse-kill-ring-mode-map (kbd "<left>") 'browse-kill-ring-previous)
+
+     ;; Face for the separator
+     (defface browse-kill-ring-separator
+       '((t . (:inherit bold)))
+       "Face used for the separator in browse-kill-ring buffer")
+     (setq browse-kill-ring-separator-face 'browse-kill-ring-separator)
+   #+END_SRC
+** Face Customisation
+   These are all the face customisations from my old emacs config that I've
+   copied over into my new setup.
+   #+BEGIN_SRC emacs-lisp
+     (if (display-graphic-p)
+         (set-face-attribute 'show-paren-mismatch-face
+                             nil
+                             :strike-through "red"))
+   #+END_SRC
+   The header line.
+   #+BEGIN_SRC emacs-lisp
+     (set-face-attribute 'header-line nil
+                         :foreground "grey75"
+                         :background "grey30"
+                         :box '(:line-width 1 :color "red"))
+   #+END_SRC
+** Line Numbering
+   The =linum+= package adds dynamically sized line numbers, based on
+   the range of line numbers that are visible on in the window.
+   #+BEGIN_SRC emacs-lisp
+     (require 'linum+)
+   #+END_SRC
+   I have a local modification to =linum+= that allows line numbers
+   within narrowed regions to be absolute rather than region relative
+   which is the default.
+   #+BEGIN_SRC emacs-lisp
+     (setq linum-narrow-relative nil)
+   #+END_SRC
+   Change the format used for the =linum+= format line numbers.  This
+   format is processed twice, the first time it is called with the
+   maximum width required, this creates a format string, this format
+   string is then used to print the line numbers.
+   #+BEGIN_SRC emacs-lisp
+     (if window-system
+       (setq linum+-smart-format "%%%dd"
+             linum+-dynamic-format "%%%dd"))
+   #+END_SRC
+   Setup some key-bindings for turning line numbers on and off.
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-c n") 'linum-mode)
+     (global-set-key (kbd "C-c N") 'global-linum-mode)
+   #+END_SRC
+   This turns on highlighting of the current line number, not
+   highlighting of the current line (that's something different).
+   #+BEGIN_SRC emacs-lisp
+     (require 'hlinum)
+     (hlinum-activate)
+   #+END_SRC
+** White Space Mode
+   Highlight trailing whitespace, and leading and trailing empty lines.
+   #+BEGIN_SRC emacs-lisp
+     (setq whitespace-style '(face trailing empty))
+     (global-whitespace-mode)
+   #+END_SRC
+** Version Control Configuration
+*** File Backup
+    Setting this to true means create the standard =file~= style
+    backups.  The default (=nil=) means emacs creates no backups,
+    relying instead on version control for backup.
+    #+BEGIN_SRC emacs-lisp
+      (setq vc-make-backup-files t)
+    #+END_SRC
+*** General Configuration
+    For now I just turn all the version control stuff off.  I really
+    would like to investigate this more though, the magit stuff looks
+    great.
+    #+BEGIN_SRC emacs-lisp
+      (setq vc-handled-backends nil)
+      (setq version-control 'never)
+    #+END_SRC
+** Keybindings
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-x <home>") 'beginning-of-buffer)
+     (global-set-key (kbd "C-x <end>") 'end-of-buffer)
+     ;; For some reason C-<home> and C-<end> don't work inside a terminal.
+     (global-unset-key (kbd "C-<home>"))
+     (global-unset-key (kbd "C-<end>"))
+   #+END_SRC
+   This is my preferred binding for =goto-line=, it does loose a useful
+   keymap, I should probably try to preserve it.
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key [?\M-g] 'goto-line)
+   #+END_SRC
+   Highlight line bindings.
+   #+BEGIN_SRC emacs-lisp
+     ;; Allow the current line to be highlighted.
+     (global-set-key (kbd "C-c h") 'hl-line-mode)
+   #+END_SRC
+   Grow and shrink window bindings.
+   #+BEGIN_SRC emacs-lisp
+     ;; Allow me to grow/shrink the window (when spilt horizontally)
+     ;; from the keyboard.
+     (global-set-key (kbd "C-x <up>") 'enlarge-window)
+     (global-set-key (kbd "C-x <down>") 'shrink-window)
+   #+END_SRC
+   Jump to matching parentheses.
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-x #") 'jump-to-matching-paren)
+   #+END_SRC
+   To open up screen space I turn off the menu and tool bar.  This
+   keybinding toggles the bars.
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "<f12>") 'toggle-menubar-and-toolbar)
+   #+END_SRC
+** Template System
+   The file template system.  The templates are located in
+   =~/.templates/= directory.  The disable regexp will stop some files
+   from having their header line updaed when the buffer is killed.
+   #+BEGIN_SRC emacs-lisp
+     (require 'template)
+     (template-initialize)
+     (setq template-auto-update-disable-regexp ".ido.last")
+     (setq template-auto-update nil)
+   #+END_SRC
+** Org Mode Setup
+   #+BEGIN_SRC emacs-lisp
+     ;;       Org Mode
+     (add-to-list 'load-path (concat elisp-directory "/org-mode/lisp"))
+     (add-to-list 'load-path (concat elisp-directory "/org-mode/contrib/lisp"))
+     (require 'org)
+     (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+     (setq org-log-done t)
+
+     (defun my-org-mode-hook ()
+       (auto-fill-mode 1)
+       (flyspell-mode 1)
+       (setq org-hide-leading-stars t)
+       (set-face-attribute 'org-hide nil
+                           :foreground "grey30")
+       (setq org-hide-emphasis-markers t)
+       (set-face-attribute 'org-code nil
+                           :inherit 'unspecified
+                           :foreground "deep sky blue"))
+     (add-hook 'org-mode-hook 'my-org-mode-hook)
+
+     (defun org-file (name)
+       (let ((org-directory (expand-file-name "~/.org/")))
+         (concat org-directory name)))
+
+     (setq org-agenda-files (list (org-file "")))
+
+     (setq org-default-notes-file (org-file "refile.org"))
+
+     (setq org-refile-targets '((org-agenda-files . (:maxlevel . 1))))
+
+     (define-key global-map "\C-cc" 'org-capture)
+     (define-key global-map "\C-cl" 'org-store-link)
+     (define-key global-map "\C-ca" 'org-agenda)
+   #+END_SRC
+** AutoComplete
+   #+BEGIN_SRC emacs-lisp
+     (require 'auto-complete-config)
+     (add-to-list 'ac-dictionary-directories
+                  (concat elisp-directory "/auto-complete/dict/"))
+     (ac-config-default)
+   #+END_SRC
+   Cycle windows backwards.
+   #+BEGIN_SRC emacs-lisp
+     ;; Function for moving through the windows backwards
+     (defun other-window-backward ()
+       "Like other window, but go backwards."
+       (interactive)
+       (other-window -1))
+     (global-set-key (kbd "C-x O") 'other-window-backward)
+   #+END_SRC
+* The End
+  Check that we've got an email address setup.  We take the email from
+  the environment.
+  #+BEGIN_SRC emacs-lisp
+    (if (not (getenv "EMAIL"))
+        (progn
+          (display-warning
+           :warning
+           "Missing EMAIL environment variable, setting email to <invalid>.")
+          (setq user-mail-address "<invalid>")))
+  #+END_SRC
+  Print a message to show we're all done.
+  #+BEGIN_SRC emacs-lisp
+    (message "All done.")
+  #+END_SRC
+* Appendix
+** Useful Notes
+*** Regexp Patterns
+    1. Regexp matching for "[" or "]" in a character set: =[][]=.

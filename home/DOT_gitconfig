@@ -1,0 +1,14 @@
+[user]
+	email = andrew.burgess@embecosm.com
+	name = Andrew Burgess
+[alias]
+	st=status
+	co=checkout
+	br=branch
+	ff=ff-merge
+	lg=log --graph --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn\\ (%cr)]"
+	oldest-ancestor = !bash -c 'diff --old-line-format= --new-line-format= <(git rev-list --first-parent \"${1:-master}\") <(git rev-list --first-parent \"${2:-HEAD}\") | head -1' -
+[color]
+	ui = auto
+[push]
+	default = simple

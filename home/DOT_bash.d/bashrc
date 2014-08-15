@@ -123,7 +123,7 @@ fi
 LOCK_DIR_PROMPT=""
 
 # Load in special git prompt support.
-source ~/.bash/git-prompt
+source ~/.bash.d/git-prompt
 
 function set_prompt
 {
@@ -601,14 +601,14 @@ function histfind ()
 #     bash completion for git and ct     #
 #========================================#
 
-if [ -f ~/.bash/git-completion ]
+if [ -f ~/.bash.d/git-completion ]
 then
-    source ~/.bash/git-completion
+    source ~/.bash.d/git-completion
 fi
 
-if [ -f ~/.bash/ct-ng.comp ]
+if [ -f ~/.bash.d/ct-ng.comp ]
 then
-    source ~/.bash/ct-ng.comp
+    source ~/.bash.d/ct-ng.comp
 fi
 
 #===============================#

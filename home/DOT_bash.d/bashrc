@@ -65,7 +65,7 @@ export LANG=en_GB
 export TDL_DATABASE=$HOME/.tdldb
 export TDL_LIST_COLOURS="PRI_HIGH=red"
 
-EMAIL=`git config user.email 2>/dev/null`
+export EMAIL=`git config user.email 2>/dev/null`
 if [ -z "${EMAIL}" ]
 then
     echo "* WARNING: Expected to find '${EMAIL_FILE}' containing"

@@ -190,6 +190,8 @@
        (if (eq (cdr pair) 'perl-mode)
            (setcdr pair 'cperl-mode)))
      (append auto-mode-alist interpreter-mode-alist))
+    ;; Start in the right mode when editing mutt files.
+    (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
   #+END_SRC
 * Package Configuration
 ** Require Some Packages
@@ -365,6 +367,14 @@
    #+BEGIN_SRC emacs-lisp
      (add-hook 'c-mode-hook 'andrew-cc-mode)
      (add-hook 'c++-mode-hook 'andrew-cc-mode)
+   #+END_SRC
+** Mail Mode
+   Put off loading my email configuration until we actually load
+   =mail-mode=, which, doesn't come from a file called =mail-mode=.
+   #+BEGIN_SRC emacs-lisp
+     (eval-after-load "sendmail" (lambda ()
+                                   (message "Loading andrew-email-mode")
+                                   (require 'andrew-email-mode)))
    #+END_SRC
 * Other
 ** Simple Helper Functions

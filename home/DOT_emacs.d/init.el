@@ -102,6 +102,8 @@
    (if (eq (cdr pair) 'perl-mode)
        (setcdr pair 'cperl-mode)))
  (append auto-mode-alist interpreter-mode-alist))
+;; Start in the right mode when editing mutt files.
+(add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 
 ;; Allow blocks to be hidden / shown on demand.
 (require 'hideshow)
@@ -208,6 +210,10 @@
 
 (add-hook 'c-mode-hook 'andrew-cc-mode)
 (add-hook 'c++-mode-hook 'andrew-cc-mode)
+
+(eval-after-load "sendmail" (lambda ()
+                              (message "Loading andrew-email-mode")
+                              (require 'andrew-email-mode)))
 
 (defun using-xemacs ()
   (string-match "XEmacs\\|Lucid" emacs-version))

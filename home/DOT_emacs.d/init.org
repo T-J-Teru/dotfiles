@@ -23,6 +23,8 @@
    already, and the mouse wheel works fine for scrolling through the file.
    #+BEGIN_SRC emacs-lisp
      (set-scroll-bar-mode nil)
+     (if (fboundp 'horizontal-scroll-bar-mode)
+         (set-horizontal-scroll-bar-mode nil))
    #+END_SRC
 
 ** Loading Global Initialisation

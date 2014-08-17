@@ -10,6 +10,8 @@
         (tool-bar-lines . 0)))
 
 (set-scroll-bar-mode nil)
+(if (fboundp 'horizontal-scroll-bar-mode)
+    (set-horizontal-scroll-bar-mode nil))
 
 (setq inhibit-default-init t)
 

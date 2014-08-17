@@ -12,3 +12,7 @@
 	ui = auto
 [push]
 	default = simple
+
+[sendemail]
+	smtpserver = /usr/bin/msmtp
+

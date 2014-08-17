@@ -305,7 +305,7 @@ sub install_file {
       }
       else
       {
-        die "Is a file, not a link\n";
+        die "File '$dest_path' is a file, not a link\n";
       }
     }
     else

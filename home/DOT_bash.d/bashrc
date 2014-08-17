@@ -45,6 +45,7 @@ alias more=less
 
 alias emacs-nw='emacs -nw'
 
+alias getmail='getmail -nl'
 
 [ -e "$HOME/.dircolors" ] && DIR_COLORS="$HOME/.dircolors"
 [ -e "$DIR_COLORS" ] || DIR_COLORS=""

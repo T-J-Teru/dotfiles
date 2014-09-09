@@ -194,6 +194,15 @@
     (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
   #+END_SRC
 * Package Configuration
+** Create A Keymap
+   I create a keymap into which I can place bindings for various
+   package functions.  Some of the more useful bindings will get
+   promoted to top level bindings over time.
+   The key-map I create is bound to =C-x C-a=.
+   #+BEGIN_SRC emacs-lisp
+     (setq ctl-x-a-map (make-sparse-keymap))
+     (define-key ctl-x-map "\C-a" ctl-x-a-map)
+   #+END_SRC
 ** Require Some Packages
    Should revisit this to see if I really need to require the packages
    at this point, or if I could setup some autoloads, and load the
@@ -210,13 +219,7 @@
 ** ACE Navigation
    The ace navigation system is a pretty neat way of jumping around within
    the visible area of a buffer.
-   First, create a new keymap that I'll bind to C-x C-a, this is going to
-   be where all the ace navigation commands will get added.
-   #+BEGIN_SRC emacs-lisp
-     (setq ctl-x-a-map (make-sparse-keymap))
-     (define-key ctl-x-map "\C-a" ctl-x-a-map)
-   #+END_SRC
-   Now add the ace navigation commands into the keymap.
+   Add the ace navigation commands into my personal key-map.
    #+BEGIN_SRC emacs-lisp
      (define-key ctl-x-a-map "j" 'ace-jump-word-mode)
      (define-key ctl-x-a-map "J" 'ace-jump-char-mode)
@@ -224,7 +227,7 @@
    #+END_SRC
    And because the =ace-jump-word-mode= is just so useful, find an even
    shorter keymap for that action.  I think that I should possibly delete
-   this and train my fingers to use the "C-x C-a j" binding instead.
+   this and train my fingers to use the =C-x C- j= binding instead.
    #+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "C-x /") 'ace-jump-word-mode)
    #+END_SRC
@@ -375,6 +378,11 @@
      (eval-after-load "sendmail" (lambda ()
                                    (message "Loading andrew-email-mode")
                                    (require 'andrew-email-mode)))
+   #+END_SRC
+** Multi-Cursor Mode
+   The only thing needed here is to setup some useful keybindings.
+   #+BEGIN_SRC emacs-lisp
+     (define-key ctl-x-a-map "e" 'mc/edit-lines)
    #+END_SRC
 * Other
 ** Simple Helper Functions

@@ -105,6 +105,9 @@
 ;; Start in the right mode when editing mutt files.
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
 
+(setq ctl-x-a-map (make-sparse-keymap))
+(define-key ctl-x-map "\C-a" ctl-x-a-map)
+
 ;; Allow blocks to be hidden / shown on demand.
 (require 'hideshow)
 ;; For doing haskell - will fail silently if haskell mode is not available on
@@ -112,9 +115,6 @@
 (require 'haskell-mode nil t)
 ;; Linker script mode.
 (require 'ld-script)
-
-(setq ctl-x-a-map (make-sparse-keymap))
-(define-key ctl-x-map "\C-a" ctl-x-a-map)
 
 (define-key ctl-x-a-map "j" 'ace-jump-word-mode)
 (define-key ctl-x-a-map "J" 'ace-jump-char-mode)
@@ -214,6 +214,8 @@
 (eval-after-load "sendmail" (lambda ()
                               (message "Loading andrew-email-mode")
                               (require 'andrew-email-mode)))
+
+(define-key ctl-x-a-map "e" 'mc/edit-lines)
 
 (defun using-xemacs ()
   (string-match "XEmacs\\|Lucid" emacs-version))

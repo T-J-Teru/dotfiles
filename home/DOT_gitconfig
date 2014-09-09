@@ -16,3 +16,5 @@
 [sendemail]
 	smtpserver = /usr/bin/msmtp
 
+[gpg]
+	program = gpg2

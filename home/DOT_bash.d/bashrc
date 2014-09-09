@@ -143,8 +143,8 @@ function prompt_command
     echo "-ne" "\033]0;`whoami`@${SHORT_HOSTNAME} ($PWD)\007"  
   fi
 
-  # Flush the history every 10 commands.
-  test $(($HISTCMD % 10)) -eq 0 && history -w
+  # Flush the history out.
+  history -a
 }
 
 export PROMPT_COMMAND=prompt_command

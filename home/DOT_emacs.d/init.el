@@ -379,6 +379,7 @@ removing\nany \\r characters."
   (set-face-attribute 'org-hide nil
                       :foreground "grey30")
   (setq org-hide-emphasis-markers t)
+  (setq org-ditaa-jar-path "/usr/share/java/ditaa.jar")
   (set-face-attribute 'org-code nil
                       :inherit 'unspecified
                       :foreground "deep sky blue"))

@@ -247,6 +247,9 @@
 
 (define-key ctl-x-a-map "e" 'mc/edit-lines)
 
+(require 'andrew-work-log)
+(define-key ctl-x-a-map "l" 'andrew-work-log/visit-log-entry)
+
 (defun using-xemacs ()
   (string-match "XEmacs\\|Lucid" emacs-version))
 
@@ -396,39 +399,7 @@ removing\nany \\r characters."
 (setq template-auto-update nil)
 (setq template-message-buffer nil)
 
-;;       Org Mode
-(add-to-list 'load-path (concat elisp-directory "/org-mode/lisp"))
-(add-to-list 'load-path (concat elisp-directory "/org-mode/contrib/lisp"))
-(require 'org)
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-(setq org-log-done t)
-
-(defun my-org-mode-hook ()
-  (auto-fill-mode 1)
-  (flyspell-mode 1)
-  (setq org-hide-leading-stars t)
-  (set-face-attribute 'org-hide nil
-                      :foreground "grey30")
-  (setq org-hide-emphasis-markers t)
-  (setq org-ditaa-jar-path "/usr/share/java/ditaa.jar")
-  (set-face-attribute 'org-code nil
-                      :inherit 'unspecified
-                      :foreground "deep sky blue"))
-(add-hook 'org-mode-hook 'my-org-mode-hook)
-
-(defun org-file (name)
-  (let ((org-directory (expand-file-name "~/.org/")))
-    (concat org-directory name)))
-
-(setq org-agenda-files (list (org-file "")))
-
-(setq org-default-notes-file (org-file "refile.org"))
-
-(setq org-refile-targets '((org-agenda-files . (:maxlevel . 1))))
-
-(define-key global-map "\C-cc" 'org-capture)
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
+(require 'andrew-org-setup)
 
 (when (require 'auto-complete-config nil t)
   (add-to-list 'ac-dictionary-directories

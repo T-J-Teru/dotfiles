@@ -36,6 +36,8 @@
 (add-to-list 'load-path (concat elisp-directory "/packages"))
 (add-to-list 'load-path (concat elisp-directory "/my-elisp"))
 
+(add-to-list 'load-path (concat elisp-directory "/cc-mode"))
+
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (add-hook 'ibuffer-mode-hook (lambda ()
                                (hl-line-mode 1)

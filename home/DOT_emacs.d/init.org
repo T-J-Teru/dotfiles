@@ -74,6 +74,29 @@
       (add-to-list 'load-path (concat elisp-directory "/packages"))
       (add-to-list 'load-path (concat elisp-directory "/my-elisp"))
     #+END_SRC
+    The following directory is not present on all my machines, but if
+    it is, this is where I place a patched version of cc-mode.
+    #+BEGIN_SRC emacs-lisp
+      (add-to-list 'load-path (concat elisp-directory "/cc-mode"))
+    #+END_SRC
+    The patched version contains just the following patch at the
+    moment:
+    #+BEGIN_SRC diff :tangle no
+      diff -r 29497e41f1b3 cc-defs.el
+      --- a/cc-defs.el        Sat Aug 23 10:42:30 2014 +0000
+      +++ b/cc-defs.el        Tue Sep 16 10:53:37 2014 +0100
+      @@ -364,7 +364,9 @@
+                 (zmacs-activate-region)
+               (zmacs-deactivate-region))
+           ;; Emacs.
+      -    `(setq mark-active ,activate)))
+      +    `(if ,activate
+      +         (activate-mark)
+      +       (deactivate-mark))))
+       
+       (defmacro c-delete-and-extract-region (start end)
+         "Delete the text between START and END and return it."
+    #+END_SRC
 ** Buffer Switching
    Use =ibuffer= rather than =list-buffers= for buffer switching.
    First turn it on, and arrange for line highlighting to be turned on

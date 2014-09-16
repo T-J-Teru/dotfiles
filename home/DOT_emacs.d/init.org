@@ -530,8 +530,8 @@
    The header line.
    #+BEGIN_SRC emacs-lisp
      (set-face-attribute 'header-line nil
-                         :foreground "grey75"
-                         :background "grey30"
+                         :foreground "grey20"
+                         :background "grey90"
                          :box '(:line-width 1 :color "red"))
    #+END_SRC
 ** Line Numbering

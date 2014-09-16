@@ -314,8 +314,8 @@ removing\nany \\r characters."
                         :strike-through "red"))
 
 (set-face-attribute 'header-line nil
-                    :foreground "grey75"
-                    :background "grey30"
+                    :foreground "grey20"
+                    :background "grey90"
                     :box '(:line-width 1 :color "red"))
 
 (require 'linum+)

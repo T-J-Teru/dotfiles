@@ -100,11 +100,15 @@
 ** Buffer Switching
    Use =ibuffer= rather than =list-buffers= for buffer switching.
    First turn it on, and arrange for line highlighting to be turned on
-   in the buffer selection buffer.
+   in the buffer selection buffer.  The call to redisplay ensures that
+   when the buffer selection buffer appears the line highlighting is
+   immediately visible, without this, the line highlight is not
+   visible until a key is pressed.
    #+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "C-x C-b") 'ibuffer)
      (add-hook 'ibuffer-mode-hook (lambda ()
                                     (hl-line-mode 1)
+                                    (redisplay)
                                     (ibuffer-auto-mode)))
    #+END_SRC
 ** Mode Line Configuration.

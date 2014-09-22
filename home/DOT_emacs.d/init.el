@@ -41,6 +41,7 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (add-hook 'ibuffer-mode-hook (lambda ()
                                (hl-line-mode 1)
+                               (redisplay)
                                (ibuffer-auto-mode)))
 
 (setq line-number-mode t)

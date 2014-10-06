@@ -1,4 +1,3 @@
-
 (setq inhibit-splash-screen t)
 
 (setq default-frame-alist

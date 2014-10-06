@@ -108,8 +108,19 @@
      (global-set-key (kbd "C-x C-b") 'ibuffer)
      (add-hook 'ibuffer-mode-hook (lambda ()
                                     (hl-line-mode 1)
-                                    (redisplay)
                                     (ibuffer-auto-mode)))
+   #+END_SRC
+   There's a little problem when trying to use =hl-line-mode= alongside
+   with =ibuffer-auto-mode=, the =ibuffer-auto-mode= installs a
+   =post-command-hook= to update the buffer list, this causes the line
+   highlighting to be lost.  The solution is to advice the ibuffer
+   redisplay engine to restore the highlighting.
+   #+BEGIN_SRC emacs-lisp
+     (eval-after-load "hl-line"
+       '(defadvice ibuffer-redisplay-engine (after
+                                             andrew-ibuffer-redisplay
+                                             activate)
+          (hl-line-highlight)))
    #+END_SRC
 ** Mode Line Configuration.
    Turn on column and line numbers in the mode line.

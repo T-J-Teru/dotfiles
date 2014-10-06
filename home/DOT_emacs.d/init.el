@@ -41,8 +41,13 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (add-hook 'ibuffer-mode-hook (lambda ()
                                (hl-line-mode 1)
-                               (redisplay)
                                (ibuffer-auto-mode)))
+
+(eval-after-load "hl-line"
+  '(defadvice ibuffer-redisplay-engine (after
+                                        andrew-ibuffer-redisplay
+                                        activate)
+     (hl-line-highlight)))
 
 (setq line-number-mode t)
 (setq column-number-mode t)

@@ -11,7 +11,7 @@
 
 (set-scroll-bar-mode nil)
 (if (fboundp 'horizontal-scroll-bar-mode)
-    (set-horizontal-scroll-bar-mode nil))
+    (horizontal-scroll-bar-mode -1))
 
 (setq inhibit-default-init t)
 

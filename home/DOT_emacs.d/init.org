@@ -24,7 +24,7 @@
    #+BEGIN_SRC emacs-lisp
      (set-scroll-bar-mode nil)
      (if (fboundp 'horizontal-scroll-bar-mode)
-         (set-horizontal-scroll-bar-mode nil))
+         (horizontal-scroll-bar-mode -1))
    #+END_SRC
 
 ** Loading Global Initialisation

@@ -31,7 +31,7 @@
 (setq package-enable-at-startup nil)
 (package-initialize)
 
-(defconst elisp-directory (expand-file-name "~/.emacs.d/"))
+(defconst elisp-directory (expand-file-name "~/.emacs.d"))
 (add-to-list 'load-path (concat elisp-directory "/packages"))
 (add-to-list 'load-path (concat elisp-directory "/my-elisp"))
 

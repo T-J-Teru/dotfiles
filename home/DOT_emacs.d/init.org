@@ -70,7 +70,7 @@
     my local packages directory.
     This code extends the =load-path= so that the packages can be found.
     #+BEGIN_SRC emacs-lisp
-      (defconst elisp-directory (expand-file-name "~/.emacs.d/"))
+      (defconst elisp-directory (expand-file-name "~/.emacs.d"))
       (add-to-list 'load-path (concat elisp-directory "/packages"))
       (add-to-list 'load-path (concat elisp-directory "/my-elisp"))
     #+END_SRC

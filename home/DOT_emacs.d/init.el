@@ -35,6 +35,8 @@
 (add-to-list 'load-path (concat elisp-directory "/packages"))
 (add-to-list 'load-path (concat elisp-directory "/my-elisp"))
 
+(add-to-list 'load-path (concat elisp-directory "/org-mode/lisp"))
+
 (add-to-list 'load-path (concat elisp-directory "/cc-mode"))
 
 (when (file-exists-p

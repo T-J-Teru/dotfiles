@@ -74,6 +74,11 @@
       (add-to-list 'load-path (concat elisp-directory "/packages"))
       (add-to-list 'load-path (concat elisp-directory "/my-elisp"))
     #+END_SRC
+    On some machines I have an updated version of =org-mode= downloaded,
+    this ensures that I use it when it's available:
+    #+BEGIN_SRC emacs-lisp
+      (add-to-list 'load-path (concat elisp-directory "/org-mode/lisp"))
+    #+END_SRC
     The following directory is not present on all my machines, but if
     it is, this is where I place a patched version of cc-mode.
     #+BEGIN_SRC emacs-lisp

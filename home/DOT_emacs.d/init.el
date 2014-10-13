@@ -48,6 +48,8 @@
                                         activate)
      (hl-line-highlight)))
 
+(defalias 'list-buffers 'ibuffer)
+
 (setq line-number-mode t)
 (setq column-number-mode t)
 

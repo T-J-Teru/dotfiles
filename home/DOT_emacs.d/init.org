@@ -122,6 +122,11 @@
                                              activate)
           (hl-line-highlight)))
    #+END_SRC
+   Finally, to make sure that we use =ibuffer= everywhere we'd otherwise
+   use =list-buffers= setup an alias,
+   #+BEGIN_SRC emacs-lisp
+     (defalias 'list-buffers 'ibuffer)
+   #+END_SRC
 ** Mode Line Configuration.
    Turn on column and line numbers in the mode line.
    #+BEGIN_SRC emacs-lisp

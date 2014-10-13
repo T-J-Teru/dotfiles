@@ -37,6 +37,11 @@
 
 (add-to-list 'load-path (concat elisp-directory "/cc-mode"))
 
+(when (file-exists-p
+       (concat elisp-directory "/cedet"))
+  (add-to-list 'load-path (concat elisp-directory "/cedet"))
+  (require 'cedet-devel-load))
+
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (add-hook 'ibuffer-mode-hook (lambda ()
                                (hl-line-mode 1)

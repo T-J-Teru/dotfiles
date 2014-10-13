@@ -97,6 +97,15 @@
        (defmacro c-delete-and-extract-region (start end)
          "Delete the text between START and END and return it."
     #+END_SRC
+    Loading the development version of =cedet= is a little more
+    involved, we need to load a special package to activate the
+    development version:
+    #+BEGIN_SRC emacs-lisp
+      (when (file-exists-p
+             (concat elisp-directory "/cedet"))
+        (add-to-list 'load-path (concat elisp-directory "/cedet"))
+        (require 'cedet-devel-load))
+    #+END_SRC
 ** Buffer Switching
    Use =ibuffer= rather than =list-buffers= for buffer switching.
    First turn it on, and arrange for line highlighting to be turned on

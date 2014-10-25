@@ -5,6 +5,9 @@
       '(
         delete-horizontal-space
         indent-for-tab-command
+        org-cycle
+        org-force-self-insert
+        org-forward-sentence
         org-self-insert-command
         overwrite-mode
         ))

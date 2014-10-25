@@ -80,6 +80,26 @@
      ("\\(%%\\)" 
       1 font-lock-format-specifier-face t)) ))
 
+(defun auto-complete-self-insert ()
+  (interactive)
+  (self-insert-command 1)
+  (auto-complete))
+
+;; ========================================================================
+;; Setup semantic mode
+(defun andrew-cc-mode/setup-semantic ()
+  (semantic-mode)
+  (semantic-idle-breadcrumbs-mode)
+  (semantic-idle-summary-mode)
+  (semantic-idle-local-symbol-highlight-mode)
+  (semantic-highlight-func-mode)
+
+  (local-set-key "\C-cj" 'semantic-ia-fast-jump)
+  (local-set-key "." 'auto-complete-self-insert)
+  (local-set-key ">" 'auto-complete-self-insert)
+
+  (add-to-list 'ac-sources 'ac-source-semantic))
+
 ;; ========================================================================
 ;; Settings for editing C/C++ files.
 (defun andrew-cc-mode ()
@@ -106,6 +126,9 @@
 
   ;; Make more use of 80 character display.
   (setq fill-column 75)
+
+  ;; Turn on semantic
+  (andrew-cc-mode/setup-semantic)
 
   ;(require 'auto-complete)
   ;(global-auto-complete-mode t)

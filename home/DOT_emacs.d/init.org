@@ -111,6 +111,17 @@
         (add-to-list 'load-path (concat elisp-directory "/cedet"))
         (require 'cedet-devel-load))
     #+END_SRC
+*** Org Mode Fixes
+    Get this in early, before anything has a chance to trigger loading
+    of =org-mode=.  These small packages include some bug fixes, and
+    small extensions to =org-mode=.  Ideally I'll push these back
+    upstream when time allows.
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'org-load-hook
+                (progn
+                  (require 'andrew-org)
+                  (require 'andrew-org-capture)))
+    #+END_SRC
 ** Buffer Switching
    Use =ibuffer= rather than =list-buffers= for buffer switching.
    First turn it on, and arrange for line highlighting to be turned on

@@ -44,6 +44,11 @@
   (add-to-list 'load-path (concat elisp-directory "/cedet"))
   (require 'cedet-devel-load))
 
+(add-hook 'org-load-hook
+          (progn
+            (require 'andrew-org)
+            (require 'andrew-org-capture)))
+
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (add-hook 'ibuffer-mode-hook (lambda ()
                                (hl-line-mode 1)

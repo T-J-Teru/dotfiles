@@ -3,9 +3,20 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        andrew-org-space
+        c-electric-colon
+        c-electric-paren
+        c-electric-semi&comma
+        c-indent-command
+        cperl-electric-backspace
+        cperl-electric-paren
+        cperl-electric-rparen
+        cperl-electric-semi
+        cperl-indent-command
         delete-horizontal-space
         indent-for-tab-command
         org-cycle
+        org-end-of-line
         org-force-self-insert
         org-forward-sentence
         org-self-insert-command

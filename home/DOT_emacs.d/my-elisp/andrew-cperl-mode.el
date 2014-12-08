@@ -8,8 +8,10 @@
   (setq show-trailing-whitespace 'nil)
   (setq cperl-extra-newline-before-brace t)
   (setq cperl-extra-newline-before-brace-multiline t)
+  (setq cperl-merge-trailing-else nil)
   (setq cperl-font-lock t)
   (setq cperl-hairy 'nil)
+  (setq cperl-indent-parens-as-block t)
   ;;
   ;; Prevent underline being used for end of line whitespace. This used to
   ;; work upto emacs 23 but then got broken.

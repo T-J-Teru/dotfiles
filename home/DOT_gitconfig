@@ -10,6 +10,8 @@
 	oldest-ancestor = !bash -c 'diff --old-line-format= --new-line-format= <(git rev-list --first-parent \"${1:-master}\") <(git rev-list --first-parent \"${2:-HEAD}\") | head -1' -
         edit-conflicts = !bash -c 'git diff --name-only --diff-filter=U | xargs emacs'
         ec=!bash -c 'git edit-conflicts'
+	branchdiff = !sh -c \"git diff `git oldest-ancestor`..\"
+	branchlog = !sh -c \"git log `git oldest-ancestor`..\"
 [color]
 	ui = auto
 [push]

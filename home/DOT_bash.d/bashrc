@@ -36,7 +36,7 @@ alias rm='rm -i'
 alias mv='mv -i'
 alias cp='cp -i'
 
-alias ls='ls --color=auto -CF'
+alias ls='ls --color=auto -CFv'
 alias ll='ls -loF'
 alias la='ls -loaF'
 alias lt='ls --sort=time'

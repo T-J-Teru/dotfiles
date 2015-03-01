@@ -23,14 +23,10 @@ A full description for (>>>FILE_SANS<<<) has not yet been written.
 
 #========================================================================#
 
-# --
-# Standard Perl Modules.
-# ..
-# --
-# User Defined Modules.
 use lib "$ENV{HOME}/lib";
 use GiveHelp qw/usage/;         # Allow -h or --help command line options.
-# ..
+
+#========================================================================#
 
 (>>>POINT<<<)
 
@@ -52,7 +48,7 @@ The following methods are defined in this script.
 
 =pod
 
-=back 4
+=back
 
 =head1 AUTHOR
 

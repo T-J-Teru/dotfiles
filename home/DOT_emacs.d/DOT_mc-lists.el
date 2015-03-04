@@ -4,7 +4,9 @@
 (setq mc/cmds-to-run-for-all
       '(
         andrew-org-space
+        auto-complete-self-insert
         c-electric-colon
+        c-electric-lt-gt
         c-electric-paren
         c-electric-semi&comma
         c-indent-command
@@ -14,6 +16,7 @@
         cperl-electric-semi
         cperl-indent-command
         delete-horizontal-space
+        electric-newline-and-maybe-indent
         indent-for-tab-command
         org-cycle
         org-end-of-line
@@ -26,4 +29,5 @@
 (setq mc/cmds-to-run-once
       '(
         asm-comment
+        sh-assignment
         ))

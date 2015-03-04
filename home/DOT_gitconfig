@@ -12,6 +12,9 @@
         ec=!bash -c 'git edit-conflicts'
 	branchdiff = !sh -c \"git diff `git oldest-ancestor`..\"
 	branchlog = !sh -c \"git log `git oldest-ancestor`..\"
+        wdiff=diff --word-diff=color
+        fall=fetch --all
+        lr=remote -v
 [color]
 	ui = auto
 [push]

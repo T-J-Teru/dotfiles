@@ -295,9 +295,9 @@
    #+END_SRC
    And because the =ace-jump-word-mode= is just so useful, find an even
    shorter keymap for that action.  I think that I should possibly delete
-   this and train my fingers to use the =C-x C- j= binding instead.
+   this and train my fingers to use the =C-x C-j= binding instead.
    #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-x /") 'ace-jump-word-mode)
+     (global-set-key (kbd "C-c /") 'ace-jump-word-mode)
    #+END_SRC
 ** Fill Column Indictator
    This package draws a faint marker down the right hand side, indicating
@@ -305,7 +305,7 @@
    marker.
    #+BEGIN_SRC emacs-lisp
      (when (fboundp 'fci-mode)
-       (global-set-key (kbd "C-x |") 'fci-mode))
+       (global-set-key (kbd "C-c |") 'fci-mode))
    #+END_SRC
    Now turn the mode on by default in a set of common language modes.
    #+BEGIN_SRC emacs-lisp
@@ -678,12 +678,12 @@
    #+BEGIN_SRC emacs-lisp
      ;; Allow me to grow/shrink the window (when spilt horizontally)
      ;; from the keyboard.
-     (global-set-key (kbd "C-x <up>") 'enlarge-window)
-     (global-set-key (kbd "C-x <down>") 'shrink-window)
+     (global-set-key (kbd "C-c <up>") 'enlarge-window)
+     (global-set-key (kbd "C-c <down>") 'shrink-window)
    #+END_SRC
    Jump to matching parentheses.
    #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-x #") 'jump-to-matching-paren)
+     (global-set-key (kbd "C-c #") 'jump-to-matching-paren)
    #+END_SRC
    To open up screen space I turn off the menu and tool bar.  This
    keybinding toggles the bars.

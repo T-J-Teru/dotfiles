@@ -30,3 +30,6 @@
 [merge "merge-changelog"]
 	name = GNU ChangeLog merge driver
 	driver = git-merge-changelog %O %A %B
+
+[diff "texinfo"]
+	funcname = ^@node[\t ][\t ]*\\([^,][^,]*\\)

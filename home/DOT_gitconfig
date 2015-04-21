@@ -26,3 +26,7 @@
 
 [gpg]
 	program = gpg2
+
+[merge "merge-changelog"]
+	name = GNU ChangeLog merge driver
+	driver = git-merge-changelog %O %A %B

@@ -141,10 +141,10 @@
 (define-key ctl-x-a-map "J" 'ace-jump-char-mode)
 (define-key ctl-x-a-map "o" 'ace-window)
 
-(global-set-key (kbd "C-x /") 'ace-jump-word-mode)
+(global-set-key (kbd "C-c /") 'ace-jump-word-mode)
 
 (when (fboundp 'fci-mode)
-  (global-set-key (kbd "C-x |") 'fci-mode))
+  (global-set-key (kbd "C-c |") 'fci-mode))
 
 (when (fboundp 'fci-mode)
   (add-hook 'c-mode-common-hook 'fci-mode)
@@ -374,10 +374,10 @@ removing\nany \\r characters."
 
 ;; Allow me to grow/shrink the window (when spilt horizontally)
 ;; from the keyboard.
-(global-set-key (kbd "C-x <up>") 'enlarge-window)
-(global-set-key (kbd "C-x <down>") 'shrink-window)
+(global-set-key (kbd "C-c <up>") 'enlarge-window)
+(global-set-key (kbd "C-c <down>") 'shrink-window)
 
-(global-set-key (kbd "C-x #") 'jump-to-matching-paren)
+(global-set-key (kbd "C-c #") 'jump-to-matching-paren)
 
 (global-set-key (kbd "<f12>") 'toggle-menubar-and-toolbar)
 

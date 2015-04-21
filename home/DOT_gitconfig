@@ -3,6 +3,7 @@
 	name = Andrew Burgess
 [alias]
 	st=status
+	sst=status --short --branch
 	co=checkout
 	br=branch
 	ff=ff-merge

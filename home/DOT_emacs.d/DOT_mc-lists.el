@@ -9,6 +9,7 @@
         c-electric-lt-gt
         c-electric-paren
         c-electric-semi&comma
+        c-electric-star
         c-indent-command
         cperl-electric-backspace
         cperl-electric-paren
@@ -18,6 +19,8 @@
         delete-horizontal-space
         electric-newline-and-maybe-indent
         indent-for-tab-command
+        jump-to-matching-paren
+        kill-sentence
         org-cycle
         org-end-of-line
         org-force-self-insert

@@ -88,7 +88,7 @@ foreach my $r (@repo)
 
   printf "| %".$repo_len."s | %".$br_len."s |", $r->{-name}, $br;
 
-  if (defined $br)
+  if ((defined $br) and (scalar (@{$r->{-remotes}}) > 0))
   {
     if (git_fetch ($r->{-path}))
     {
@@ -111,6 +111,11 @@ foreach my $r (@repo)
   else
   {
     print "   N/A |  N/A |";
+
+    if (scalar (@{$r->{-remotes}}) == 0)
+    {
+      print " (No remotes)";
+    }
   }
 
   printf "\n";
@@ -127,6 +132,39 @@ The following methods are defined in this script.
 =over 2
 
 =cut
+
+#========================================================================#
+
+=pod
+
+=item B<git_remote_names>
+
+Take the full path to a repository.  Return a list containing the names of
+all remotes configured for this repository.  If there are no remotes, or
+the list of remote names could not be obtained, then return the empty list.
+
+The remote names are obtained using:
+
+    git remote
+
+=cut
+
+sub git_remote_names {
+  my $repo = shift;
+
+  my $cwd = getcwd () or return ();
+  chdir $repo or return ();
+
+  my $output = `git remote 2>/dev/null`;
+  my $success = ($? == 0);
+
+  chdir $cwd or return ();
+  return () unless ($success);
+
+  my @repo = split (/\n/, $output);
+
+  return @repo;
+}
 
 #========================================================================#
 
@@ -290,9 +328,11 @@ sub find_repositories {
     if (-d "$cwd/$name/.git")
     {
       my $br = git_current_branch ("$cwd/$name");
+      my @remotes = git_remote_names ("$cwd/$name");
       push @repo_list, { -name => $name,
                          -path => "$cwd/$name",
-                         -branch => $br };
+                         -branch => $br,
+                         -remotes => \@remotes };
     }
   }
 

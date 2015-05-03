@@ -8,6 +8,7 @@
 	br=branch
 	ff=ff-merge
 	lg=log --graph --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%an\\ (%cr)]"
+	slg=log --simplify-by-decoration --full-history --graph --pretty=format:"%C(yellow)%h%Cred%d%Creset"
 	oldest-ancestor = !bash -c 'diff --old-line-format= --new-line-format= <(git rev-list --first-parent \"${1:-master}\") <(git rev-list --first-parent \"${2:-HEAD}\") | head -1' -
         edit-conflicts = !bash -c 'git diff --name-only --diff-filter=U | xargs emacs'
         ec=!bash -c 'git edit-conflicts'

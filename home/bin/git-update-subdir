@@ -1,0 +1,312 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+#========================================================================#
+
+=pod
+
+=head1 NAME
+
+git-update-subdir - update all git repositories within current directory.
+
+=head1 OPTIONS
+
+B<git-update-subdir> [-h|--help]
+
+=head1 SYNOPSIS
+
+Many projects I work on require several git repositories to be checked out
+within a single directory.  A frequent task is to go to the project root
+directory and then update all of the different git repositories.
+
+Consider a directory layout like this:
+
+  project-root/
+            git-repo-a
+            git-repo-b
+            git-repo-c
+
+Now I can simply move into I<project-root> and run this script, and all of
+the git repositories will be updated.
+
+=head2 What Is Updated
+
+When I talk about a git repository being updated I mean the following:
+
+=over 2
+
+=item Fetch
+
+A fetch is performed from all of the remotes that might be configured
+within a single repository.  A single git repository will frequently have
+multiple remotes set up.
+
+=item Fast Forward
+
+A fast forward update is performed of the current active branch.  This will
+only succeed if there are no local commits to the branch.  This suits the
+way in which I prefer to work, but might not be the best solution for
+everyone.
+
+=back
+
+=cut
+
+#========================================================================#
+
+use lib "$ENV{HOME}/lib";
+use GiveHelp qw/usage/;         # Allow -h or --help command line options.
+use List::Util qw/max/;
+use Boolean;
+use Cwd;
+
+#========================================================================#
+
+$| = True; # Autoflush
+
+print "Finding repositories.....";
+my @repo = find_repositories ();
+my $repo_len = max (map { safe_length ($_->{-name}) } @repo);
+my $br_len = max (map { safe_length ($_->{-branch}) } @repo);
+print "".scalar (@repo)." found.\n";
+
+@repo = sort {$a->{-name} cmp $b->{-name}} @repo;
+
+$repo_len = max ( $repo_len, 4);
+$br_len = max ($br_len, 6);
+
+printf "| %".$repo_len."s | %".$br_len."s | Fetch |   FF |\n",
+  "Repo", "Branch";
+print "+-".("-"x$repo_len)."-+-".("-"x$br_len)."-+-".
+  ("-"x 5)."-+-".("-"x 4)."-+\n";
+foreach my $r (@repo)
+{
+  my $br = $r->{-branch};
+  $br = "????" unless (defined $br);
+
+  printf "| %".$repo_len."s | %".$br_len."s |", $r->{-name}, $br;
+
+  if (defined $br)
+  {
+    if (git_fetch ($r->{-path}))
+    {
+      print "  Pass |";
+
+      if (git_fast_forward ($r->{-path}))
+      {
+        print " Pass |";
+      }
+      else
+      {
+        print " Fail |";
+      }
+    }
+    else
+    {
+      print "  Fail |  N/A |";
+    }
+  }
+  else
+  {
+    print "   N/A |  N/A |";
+  }
+
+  printf "\n";
+}
+
+#========================================================================#
+
+=pod
+
+=head1 METHODS
+
+The following methods are defined in this script.
+
+=over 2
+
+=cut
+
+#========================================================================#
+
+=pod
+
+=item B<git_fast_forward>
+
+Take the full path to a repository and perform a fast forward within the
+repository.  Return true if the fast forward was a success, otherwise
+return false.
+
+The fast forward is performed with the following command:
+
+    git ff
+
+This is a special git alias that I have configured, see my ~/.gitconfig for
+details.
+
+=cut
+
+sub git_fast_forward {
+  my $repo = shift;
+
+  my $cwd = getcwd () or return False;
+  chdir $repo or return False;
+
+  `git ff >/dev/null 2>/dev/null`;
+  my $status = ($? == 0);
+
+  chdir $cwd or return False;
+  return $status;
+}
+
+#========================================================================#
+
+=pod
+
+=item B<git_fetch>
+
+Take the full path to a repository.  Fetch from all remotes configured
+within that repository.  Return true if the fetch was a success, otherwise
+return false.
+
+The fetch is performed with the following command:
+
+    git fetch --all
+
+=cut
+
+sub git_fetch {
+  my $repo = shift;
+
+  my $cwd = getcwd () or return False;
+  chdir $repo or return False;
+
+  `git fetch --all >/dev/null 2>/dev/null`;
+  my $status = ($? == 0);
+
+  chdir $cwd or return False;
+  return $status;
+}
+
+#========================================================================#
+
+=pod
+
+=item B<git_current_branch>
+
+Take the full path to a repository.  Try to determine the currently active
+branch in the repository and return the branch name as a string.  If the
+current branch can't be determined, then return undef.
+
+To figure out the current branch the following command is used:
+
+    git rev-parse --abbrev-ref HEAD
+
+=cut
+
+sub git_current_branch {
+  my $repo = shift;
+
+  my $cwd = getcwd ();
+  chdir $repo or return undef;
+
+  my $branch = `git rev-parse --abbrev-ref HEAD 2>/dev/null`;
+  if (($? != 0) || ($branch eq ""))
+  {
+    $branch = undef;
+  }
+
+  chomp $branch if (defined $branch);
+  chdir $cwd or return undef;
+  return $branch;
+}
+
+#========================================================================#
+
+=pod
+
+=item B<safe_length>
+
+Take a string parameter, and return the length.  If the string is undefined
+then return a length of 0.
+
+=cut
+
+sub safe_length {
+  my $str = shift;
+  return (defined $str) ? length ($str) : 0;
+}
+
+#========================================================================#
+
+=pod
+
+=item B<find_repositories>
+
+Find all git repositories below the current working directory.  A git
+repository is a directory that contains a subdirectory called I<.git>.
+
+The return value is a list of hashes, one hash for each repository found.
+
+For each repository found the hash contains the following keys:
+
+=over 2
+
+=item I<-name>
+
+The name of the repository directory.
+
+=item I<-path>
+
+The full path to the repository directory.
+
+=item I<-branch>
+
+The name of the currently active branch in the repository, or undef if the
+active branch could not be determined.  To determine the currently active
+branch a call to I<git_current_branch> is made.
+
+=back
+
+=cut
+
+sub find_repositories {
+  my $cwd = getcwd ();
+
+  my @candidate_list;
+  opendir (my $dh, $cwd) or
+    die "Failed to open '$cwd' for reading: $!";
+  while (readdir $dh)
+  {
+    push @candidate_list, $_ if (-d "$cwd/$_");
+  }
+  closedir $dh or
+    die "Failed to close '$cwd' after reading: $!";
+
+  my @repo_list;
+  foreach my $name (@candidate_list)
+  {
+    if (-d "$cwd/$name/.git")
+    {
+      my $br = git_current_branch ("$cwd/$name");
+      push @repo_list, { -name => $name,
+                         -path => "$cwd/$name",
+                         -branch => $br };
+    }
+  }
+
+  return @repo_list;
+}
+
+#========================================================================#
+
+=pod
+
+=back
+
+=head1 AUTHOR
+
+Andrew Burgess, 29 Apr 2015
+
+=cut

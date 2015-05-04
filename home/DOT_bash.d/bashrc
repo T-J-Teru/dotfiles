@@ -310,10 +310,10 @@ function custom-cd ()
             local final_dir=${PWD}
 
             # Move back to the starting position
-            builtin cd ${initial_dir}
+            builtin cd "${initial_dir}"
 
             # And jump to the destination, adding to the stack.
-            builtin pushd ${final_dir} >/dev/null 2>&1
+            builtin pushd "${final_dir}" >/dev/null 2>&1
 
             # Lets show folk where they ended up
             show_pwd="Y"

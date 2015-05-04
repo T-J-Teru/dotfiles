@@ -459,7 +459,7 @@ function pretty_pwd
 {
     if [ -t 1 ]
     then
-        echo -e PWD: `colourize_path ${PWD}`
+        echo -e PWD: `colourize_path "${PWD}"`
     else
         builtin pwd
     fi

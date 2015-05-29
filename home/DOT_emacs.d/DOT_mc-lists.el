@@ -4,6 +4,7 @@
 (setq mc/cmds-to-run-for-all
       '(
         andrew-org-space
+        asm-colon
         auto-complete-self-insert
         c-electric-colon
         c-electric-lt-gt
@@ -27,10 +28,12 @@
         org-forward-sentence
         org-self-insert-command
         overwrite-mode
+        tcl-electric-hash
         ))
 
 (setq mc/cmds-to-run-once
       '(
         asm-comment
+        handle-switch-frame
         sh-assignment
         ))

@@ -40,7 +40,7 @@ sub new {
   # Change 'initialise' instead #
   #-----------------------------#
 
-  my $self  = bless {}, $class;  
+  my $self  = bless {}, $class;
   $self->initialise(@_);
   return $self;
 }
@@ -58,7 +58,7 @@ Initialise this instance of this class.
 sub initialise {
   my $self = shift;
   my %args = @_;
-  
+
   (>>>POINT<<<)
 }
 
@@ -66,7 +66,7 @@ sub initialise {
 
 =pod
 
-=back 4
+=back
 
 =head1 AUTHOR
 

@@ -175,7 +175,45 @@ xtitle ""
 
 export MANPATH=${MANPATH}
 export INFOPATH=$INFOPATH
-export PATH=$HOME/bin:$HOME/.software/bin:$PATH
+
+# Take a directory, add it to the start of path.  If the first
+# parameter is '-end' then add the directory to the end of the
+# path instead of the beginning.
+# TODO: Maybe should remove duplicate entries from the path?
+function addpath
+{
+    local NP=$1
+
+    if [ "$NP" == "-end" ]
+    then
+        AT_END=1
+        NP="$2"
+    fi
+
+    # Check it's an actual directory.
+    if [ ! -d "$NP" ]
+    then
+        echo "Invalid path: $NP"
+        return 1
+    fi
+
+    # Remove trailing "/"
+    NP=${NP%/}
+
+    if [ -z $PATH ]
+    then
+        PATH=$NP
+    elif [ -v AT_END ]
+    then
+        PATH=$PATH:$NP
+    else
+        PATH=$NP:$PATH
+    fi
+    return 0
+}
+
+addpath $HOME/bin
+addpath $HOME/.software/bin
 
 #==================================================#
 #     Stuff for looking at the command history     #

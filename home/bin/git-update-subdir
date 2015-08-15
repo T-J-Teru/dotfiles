@@ -61,8 +61,24 @@ use GiveHelp qw/usage/;         # Allow -h or --help command line options.
 use List::Util qw/max/;
 use Boolean;
 use Cwd;
+use Getopt::Long;
 
 #========================================================================#
+
+my $use_colour = True;
+GetOptions ("colour!" => \$use_colour);
+
+my ($PASS_STRING, $FAIL_STRING);
+if ($use_colour)
+{
+  $PASS_STRING = "\033[0;32mPass\033[0m";
+  $FAIL_STRING = "\033[0;31mFail\033[0m";
+}
+else
+{
+  $PASS_STRING = "Pass";
+  $FAIL_STRING = "Fail";
+}
 
 $| = True; # Autoflush
 
@@ -92,20 +108,20 @@ foreach my $r (@repo)
   {
     if (git_fetch ($r->{-path}))
     {
-      print "  Pass |";
+      printf "  %s |", $PASS_STRING;
 
       if (git_fast_forward ($r->{-path}))
       {
-        print " Pass |";
+        printf " %s |", $PASS_STRING;
       }
       else
       {
-        print " Fail |";
+        printf " %s |", $FAIL_STRING;
       }
     }
     else
     {
-      print "  Fail |  N/A |";
+      printf "  %s |  N/A |", $FAIL_STRING;
     }
   }
   else

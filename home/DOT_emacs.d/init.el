@@ -361,7 +361,7 @@ removing\nany \\r characters."
 (when (require 'hlinum nil t)
   (hlinum-activate))
 
-(setq whitespace-style '(face trailing empty))
+(setq whitespace-style '(face trailing))
 (global-whitespace-mode)
 
 (setq vc-make-backup-files t)

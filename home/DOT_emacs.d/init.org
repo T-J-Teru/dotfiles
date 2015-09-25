@@ -647,9 +647,12 @@
        (hlinum-activate))
    #+END_SRC
 ** White Space Mode
-   Highlight trailing whitespace, and leading and trailing empty lines.
+   Highlight trailing whitespace only.  This used to highlight leading
+   and trailing empty lines too, but that conflicts with things like
+   auto-complete near the end of the buffer, so I've turned it off for
+   now.
    #+BEGIN_SRC emacs-lisp
-     (setq whitespace-style '(face trailing empty))
+     (setq whitespace-style '(face trailing))
      (global-whitespace-mode)
    #+END_SRC
 ** Version Control Configuration

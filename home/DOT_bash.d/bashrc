@@ -65,13 +65,6 @@ export LANG=en_GB.UTF-8
 export TDL_DATABASE=$HOME/.tdldb
 export TDL_LIST_COLOURS="PRI_HIGH=red"
 
-export EMAIL=`git config user.email 2>/dev/null`
-if [ -z "${EMAIL}" ]
-then
-    echo "* WARNING: Expected to find '${EMAIL_FILE}' containing"
-    echo "*  an email address."
-fi
-
 export GDBVER=7.7
 export GCCVER=4.7.2
 export BINUTILSVER=2.22
@@ -213,6 +206,15 @@ function addpath
 
 addpath $HOME/bin
 addpath $HOME/.software/bin
+
+#==================================================#
+#     Setup An EMAIL Environment Variable          #
+#==================================================#
+
+export EMAIL=`git config user.email 2>/dev/null`
+
+[ -z "${EMAIL}" ] && \
+    echo "* WARNING: Could not get a suitable email from git."
 
 #==================================================#
 #     Stuff for looking at the command history     #

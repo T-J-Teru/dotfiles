@@ -286,18 +286,30 @@
    #+END_SRC
 ** ACE Navigation
    The ace navigation system is a pretty neat way of jumping around within
-   the visible area of a buffer.
-   Add the ace navigation commands into my personal key-map.
+   the visible area of a buffer, however, the original ace packages
+   are now pretty much unmaintained.  Luckily, there's now =avy= which
+   is a replacement.  The ace-window, is, strangely not part of the
+   original ace jump package, but is written by the same person who
+   has now written the avy replacement package.
+   Add the avy navigation commands into my personal key-map.
    #+BEGIN_SRC emacs-lisp
-     (define-key ctl-x-a-map "j" 'ace-jump-word-mode)
-     (define-key ctl-x-a-map "J" 'ace-jump-char-mode)
+     (define-key ctl-x-a-map "j" 'avy-goto-word-or-subword-1)
+     (define-key ctl-x-a-map "J" 'avy-goto-char)
      (define-key ctl-x-a-map "o" 'ace-window)
    #+END_SRC
-   And because the =ace-jump-word-mode= is just so useful, find an even
-   shorter keymap for that action.  I think that I should possibly delete
-   this and train my fingers to use the =C-x C-j= binding instead.
+   And because the avy jumping is just so useful, find an even
+   shorter keymap for that action.
    #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-c /") 'ace-jump-word-mode)
+     (global-set-key (kbd "C-c /") 'avy-goto-word-or-subword-1)
+     (global-set-key (kbd "C-c w") 'ace-window)
+   #+END_SRC
+   Finally, some package customisation.
+   #+BEGIN_SRC emacs-lisp
+     (with-eval-after-load 'avy
+       (setq avy-background 't)
+       (set-face-attribute 'avy-lead-face nil
+       :foreground "red"
+       :background 'unspecified))
    #+END_SRC
 ** Fill Column Indictator
    This package draws a faint marker down the right hand side, indicating

@@ -138,11 +138,18 @@
 ;; Linker script mode.
 (require 'ld-script)
 
-(define-key ctl-x-a-map "j" 'ace-jump-word-mode)
-(define-key ctl-x-a-map "J" 'ace-jump-char-mode)
+(define-key ctl-x-a-map "j" 'avy-goto-word-or-subword-1)
+(define-key ctl-x-a-map "J" 'avy-goto-char)
 (define-key ctl-x-a-map "o" 'ace-window)
 
-(global-set-key (kbd "C-c /") 'ace-jump-word-mode)
+(global-set-key (kbd "C-c /") 'avy-goto-word-or-subword-1)
+(global-set-key (kbd "C-c w") 'ace-window)
+
+(with-eval-after-load 'avy
+  (setq avy-background 't)
+  (set-face-attribute 'avy-lead-face nil
+  :foreground "red"
+  :background 'unspecified))
 
 (when (fboundp 'fci-mode)
   (global-set-key (kbd "C-c |") 'fci-mode))

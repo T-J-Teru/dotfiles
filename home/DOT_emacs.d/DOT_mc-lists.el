@@ -9,7 +9,9 @@
         c-electric-colon
         c-electric-lt-gt
         c-electric-paren
+        c-electric-pound
         c-electric-semi&comma
+        c-electric-slash
         c-electric-star
         c-indent-command
         cperl-electric-backspace
@@ -18,6 +20,7 @@
         cperl-electric-semi
         cperl-indent-command
         delete-horizontal-space
+        delete-indentation
         electric-newline-and-maybe-indent
         indent-for-tab-command
         jump-to-matching-paren
@@ -26,9 +29,13 @@
         org-end-of-line
         org-force-self-insert
         org-forward-sentence
+        org-kill-line
         org-self-insert-command
         overwrite-mode
+        tcl-electric-brace
+        tcl-electric-char
         tcl-electric-hash
+        tcl-indent-command
         ))
 
 (setq mc/cmds-to-run-once

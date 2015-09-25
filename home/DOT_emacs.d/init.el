@@ -164,6 +164,7 @@
 (define-key isearch-mode-map iedit-toggle-key-default 'iedit-mode-from-isearch)
 (define-key esc-map iedit-toggle-key-default 'iedit-execute-last-modification)
 (define-key help-map iedit-toggle-key-default 'iedit-mode-toggle-on-function)
+(define-key global-map (kbd "C-c ;") 'iedit-mode-toggle-on-function)
 
 (require 'icomplete+ nil t)
 (icomplete-mode)

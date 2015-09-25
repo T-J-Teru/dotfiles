@@ -46,6 +46,7 @@ alias more=less
 alias emacs-nw='emacs -nw'
 
 alias getmail='getmail -nl'
+alias grep='grep --color=auto -I --exclude="*~"'
 
 [ -e "$HOME/.dircolors" ] && DIR_COLORS="$HOME/.dircolors"
 [ -e "$DIR_COLORS" ] || DIR_COLORS=""
@@ -58,8 +59,6 @@ export SHORT_HOSTNAME=$HOSTNAME
 export EDITOR=emacs-nw
 export PAGER=less
 export CVSEDITOR=${EDITOR}
-
-export GREP_OPTIONS="-I --exclude=*~"
 
 export LANG=en_GB.UTF-8
 

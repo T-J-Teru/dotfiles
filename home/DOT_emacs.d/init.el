@@ -386,6 +386,7 @@ removing\nany \\r characters."
 (template-initialize)
 (setq template-auto-update-disable-regexp ".ido.last")
 (setq template-auto-update nil)
+(setq template-message-buffer nil)
 
 ;;       Org Mode
 (add-to-list 'load-path (concat elisp-directory "/org-mode/lisp"))

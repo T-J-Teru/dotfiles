@@ -699,6 +699,7 @@
      (template-initialize)
      (setq template-auto-update-disable-regexp ".ido.last")
      (setq template-auto-update nil)
+     (setq template-message-buffer nil)
    #+END_SRC
 ** Org Mode Setup
    #+BEGIN_SRC emacs-lisp

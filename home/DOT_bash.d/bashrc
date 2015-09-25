@@ -166,7 +166,7 @@ xtitle ""
 #==============#
 
 export MANPATH=${MANPATH}
-export INFOPATH=$INFOPATH
+export INFOPATH=${INFOPATH}:/usr/share/info
 
 # Take a directory, add it to the start of path.  If the first
 # parameter is '-end' then add the directory to the end of the

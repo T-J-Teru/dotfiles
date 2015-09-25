@@ -102,6 +102,11 @@
        (defmacro c-delete-and-extract-region (start end)
          "Delete the text between START and END and return it."
     #+END_SRC
+    Add the =notmuch= email package to the list of directories to load
+    package from:
+    #+BEGIN_SRC emacs-lisp
+      (add-to-list 'load-path (concat elisp-directory "/notmuch"))
+    #+END_SRC
     Loading the development version of =cedet= is a little more
     involved, we need to load a special package to activate the
     development version:

@@ -40,6 +40,8 @@
 
 (add-to-list 'load-path (concat elisp-directory "/cc-mode"))
 
+(add-to-list 'load-path (concat elisp-directory "/notmuch"))
+
 (when (file-exists-p
        (concat elisp-directory "/cedet"))
   (add-to-list 'load-path (concat elisp-directory "/cedet"))

@@ -41,6 +41,8 @@ alias ll='ls -loF'
 alias la='ls -loaF'
 alias lt='ls --sort=time'
 
+alias tree='tree -v'
+
 alias more=less
 
 alias emacs-nw='emacs -nw'

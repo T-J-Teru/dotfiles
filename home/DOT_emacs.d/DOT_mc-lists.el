@@ -6,6 +6,7 @@
         andrew-org-space
         asm-colon
         auto-complete-self-insert
+        c-electric-brace
         c-electric-colon
         c-electric-lt-gt
         c-electric-paren
@@ -19,6 +20,7 @@
         cperl-electric-rparen
         cperl-electric-semi
         cperl-indent-command
+        cua-scroll-up
         delete-horizontal-space
         delete-indentation
         electric-newline-and-maybe-indent

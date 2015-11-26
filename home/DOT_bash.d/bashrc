@@ -143,21 +143,25 @@ function prompt_command
 
 export PROMPT_COMMAND=prompt_command
 
-# Allow the window title to be changed. Either manually to a 
+# Allow the window title to be changed. Either manually to a
 # fixed string, or change everytime we switch directories.
 function xtitle
 {
-  if [ "$TERM" = "xterm" ]
-  then
-
-    if [ "$1" == "" ]
-    then
-	WINDOW_TITLE=""
-    else
-        echo -ne "\033]0;$1\007"
-	WINDOW_TITLE=$1
-    fi
-  fi
+  case $TERM in
+      xterm*)
+          if [ "$1" == "" ]
+          then
+	      WINDOW_TITLE=""
+          else
+              echo -ne "\033]0;$1\007"
+	      WINDOW_TITLE=$1
+          fi
+          ;;
+      *)
+          echo "Unable to change window title"
+          return 1
+          ;;
+  esac
 }
 
 # Change to default, auto-updating, window title.

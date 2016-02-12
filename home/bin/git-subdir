@@ -9,31 +9,67 @@ use strict;
 
 =head1 NAME
 
-git-update-subdir - update all git repositories within current directory.
+git-subdir - Operate on a directory full of git repositories.
 
 =head1 OPTIONS
 
-B<git-update-subdir> [-h|--help]
+B<git-subdir> [ -h|--help ]
+              [ --colour | --no-colour ]
+              [ --branches ]
+              [ --update ]
 
 =head1 SYNOPSIS
 
 Many projects I work on require several git repositories to be checked out
-within a single directory.  A frequent task is to go to the project root
-directory and then update all of the different git repositories.
-
-Consider a directory layout like this:
+within a single directory in order to build all of the required components.
+The directory structure of the project might well look something like this
+then:
 
   project-root/
             git-repo-a
             git-repo-b
             git-repo-c
 
-Now I can simply move into I<project-root> and run this script, and all of
-the git repositories will be updated.
+I frequently need to perform operations on all of the sub-repositories, for
+example, find out which branches are checked out in each, or perform a
+fetch for all of the sub-repositories.
 
-=head2 What Is Updated
+This script adds a new git sub-command I<subdir> that allows git to operate
+on a repository struture like the one described above.
 
-When I talk about a git repository being updated I mean the following:
+=head1 OPTIONS
+
+=over 2
+
+=item B<--update>
+
+Enter each of the sub-repositories and perform an update, as described in
+L</"WHAT IS AN UPDATE">.
+
+=item B<--branches>
+
+Causes information about the current branch in each of the sub-repositories
+to be displayed.  Currently this option is on by default, and can't be
+turned off.  As this script gains more options then this flag might start
+to have more meaning.
+
+=item B<--colour> | B<--no-color>
+
+By default colour is used in the output.  Use B<--no-color> to disable
+colour in the output.
+
+=item B<--help> | B<-h>
+
+Display this help text.  This option does not work when run through git, as
+git parses off the '--help' option and then looks for a man page
+corresponding to the command.
+
+=back
+
+=head1 WHAT IS AN UPDATE
+
+An update in the context of a directory full of git repositories means the
+following:
 
 =over 2
 
@@ -66,7 +102,14 @@ use Getopt::Long;
 #========================================================================#
 
 my $use_colour = True;
-GetOptions ("colour!" => \$use_colour);
+my $update => False;
+my $branches => False;
+GetOptions ("colour!" => \$use_colour,
+            "update" => \$update,
+            "branches" => \$branches);
+
+# Actually, we always display the branches, so...
+$branches = True;
 
 my ($PASS_STRING, $FAIL_STRING);
 if ($use_colour)
@@ -93,16 +136,26 @@ print "".scalar (@repo)." found.\n";
 $repo_len = max ( $repo_len, 4);
 $br_len = max ($br_len, 6);
 
-printf "| %".$repo_len."s | %".$br_len."s | Fetch |   FF |\n",
-  "Repo", "Branch";
-print "+-".("-"x$repo_len)."-+-".("-"x$br_len)."-+-".
-  ("-"x 5)."-+-".("-"x 4)."-+\n";
+printf "| %".$repo_len."s | %".$br_len."s |", "Repo", "Branch";
+print " Fetch |   FF |" if ($update);
+print "\n";
+
+print "+-".("-"x$repo_len)."-+-".("-"x$br_len)."-+";
+print "-".("-"x 5)."-+-".("-"x 4)."-+" if ($update);
+print "\n";
+
 foreach my $r (@repo)
 {
   my $br = $r->{-branch};
   $br = "????" unless (defined $br);
 
   printf "| %".$repo_len."s | %".$br_len."s |", $r->{-name}, $br;
+
+  if (not $update)
+  {
+    print "\n";
+    next;
+  }
 
   if ((defined $br) and (scalar (@{$r->{-remotes}}) > 0))
   {

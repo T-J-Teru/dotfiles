@@ -17,6 +17,7 @@ B<git-subdir> [ -h|--help ]
               [ --colour | --no-colour ]
               [ --branches ]
               [ --update ]
+              [ --status ]
 
 =head1 SYNOPSIS
 
@@ -52,6 +53,12 @@ Causes information about the current branch in each of the sub-repositories
 to be displayed.  Currently this option is on by default, and can't be
 turned off.  As this script gains more options then this flag might start
 to have more meaning.
+
+=item B<--status>
+
+Display status about each git sub-repository, this includes the number of
+patches ahead and behind the upstream branch, along with the number of
+local changes, and the number of untracked files.
 
 =item B<--colour> | B<--no-color>
 
@@ -104,9 +111,14 @@ use Getopt::Long;
 my $use_colour = True;
 my $update => False;
 my $branches => False;
+my $status => False;
 GetOptions ("colour!" => \$use_colour,
             "update" => \$update,
-            "branches" => \$branches);
+            "branches" => \$branches,
+            "status" => \$status);
+
+
+($update or $branches or $status) or usage ();
 
 # Actually, we always display the branches, so...
 $branches = True;
@@ -138,10 +150,12 @@ $br_len = max ($br_len, 6);
 
 printf "| %".$repo_len."s | %".$br_len."s |", "Repo", "Branch";
 print " Fetch |   FF |" if ($update);
+print " Commits | Local Ch. | Untracked |" if ($status);
 print "\n";
 
 print "+-".("-"x$repo_len)."-+-".("-"x$br_len)."-+";
 print "-".("-"x 5)."-+-".("-"x 4)."-+" if ($update);
+print "-".("-"x 7)."-+-".("-"x 9)."-+-".("-"x 9)."-+" if ($status);
 print "\n";
 
 foreach my $r (@repo)
@@ -151,39 +165,64 @@ foreach my $r (@repo)
 
   printf "| %".$repo_len."s | %".$br_len."s |", $r->{-name}, $br;
 
-  if (not $update)
+  if ($update)
   {
-    print "\n";
-    next;
-  }
-
-  if ((defined $br) and (scalar (@{$r->{-remotes}}) > 0))
-  {
-    if (git_fetch ($r->{-path}))
+    if ((defined $br) and (scalar (@{$r->{-remotes}}) > 0))
     {
-      printf "  %s |", $PASS_STRING;
-
-      if (git_fast_forward ($r->{-path}))
+      if (git_fetch ($r->{-path}))
       {
-        printf " %s |", $PASS_STRING;
+        printf "  %s |", $PASS_STRING;
+
+        if (git_fast_forward ($r->{-path}))
+        {
+          printf " %s |", $PASS_STRING;
+        }
+        else
+        {
+          printf " %s |", $FAIL_STRING;
+        }
       }
       else
       {
-        printf " %s |", $FAIL_STRING;
+        printf "  %s |  N/A |", $FAIL_STRING;
       }
     }
     else
     {
-      printf "  %s |  N/A |", $FAIL_STRING;
+      print "   N/A |  N/A |";
+
+      if (scalar (@{$r->{-remotes}}) == 0)
+      {
+        print " (No remotes)";
+      }
     }
   }
-  else
-  {
-    print "   N/A |  N/A |";
 
-    if (scalar (@{$r->{-remotes}}) == 0)
+  if ($status)
+  {
+    # Print +X/-Y for patches ahead/behind.
+    my ($ahead,$behind) = git_get_ahead_behind_counts ($r->{-path});
+    printf " %7s |", "+${ahead}/-${behind}";
+
+    my ($local, $untracked) = git_count_local_and_untracked ($r->{-path});
+    # Print Yes/No for local changes.
+    if ($local > 0)
     {
-      print " (No remotes)";
+      printf " %9s |", "Yes ($local)";
+    }
+    else
+    {
+      printf " %9s |", "No";
+    }
+
+    # Print Yes/No for untracked files.
+    if ($untracked > 0)
+    {
+      printf " %9s |", "Yes ($untracked)";
+    }
+    else
+    {
+      printf " %9s |", "No";
     }
   }
 
@@ -201,6 +240,86 @@ The following methods are defined in this script.
 =over 2
 
 =cut
+
+#========================================================================#
+
+=pod
+
+=item B<git_count_local_and_untracked>
+
+Take the full path to a repository.  Return a list of two items, the number
+of local changes, and the number of untracked files.  If there's any
+problems then the numbers 0, 0 will be returned.
+
+The number of local changes, and untracked files are extracted from:
+
+    git status --porcelain
+
+=cut
+
+sub git_count_local_and_untracked {
+  my $repo = shift;
+
+  my $cwd = getcwd () or return ();
+  chdir $repo or return ();
+
+  my $output = `git status --porcelain`;
+  my $success = ($? == 0);
+
+  chdir $cwd or return ();
+  return (0, 0) unless ($success);
+
+  my @lines = split (/\n/, $output);
+  my ($local, $untracked) = (0,0);
+
+  foreach (@lines)
+  {
+    $local++ if ((m/^ M/) or (m/^M /));
+    $untracked++ if (m/^??/);
+  }
+
+  return ($local, $untracked);
+}
+
+#========================================================================#
+
+=pod
+
+=item B<git_get_ahead_behind_counts>
+
+Take the full path to a repository.  Return a list of two items, the number
+of commits ahead and behind the upstream branch.  If anything goes wrong
+then the numbers 0, 0 will be returned.
+
+The commits are extracted by examining the output of this command:
+
+    git rev-list --left-right --boundary @{u}...
+
+=cut
+
+sub git_get_ahead_behind_counts {
+  my $repo = shift;
+
+  my $cwd = getcwd () or return ();
+  chdir $repo or return ();
+
+  my $output = `git rev-list --left-right --boundary \@{u}... 2>/dev/null`;
+  my $success = ($? == 0);
+
+  chdir $cwd or return ();
+  return (0, 0) unless ($success);
+
+  my @commits = split (/\n/, $output);
+  my ($ahead, $behind) = (0,0);
+
+  foreach (@commits)
+  {
+    $ahead++ if (m/^>/);
+    $behind++ if (m/^</);
+  }
+
+  return ($ahead, $behind);
+}
 
 #========================================================================#
 

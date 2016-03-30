@@ -17,6 +17,7 @@
         wdiff=diff --word-diff=color
         fall=fetch --all
         lr=remote -v
+        count-conflicts = !bash -c 'git diff --name-only --diff-filter=U | xargs grep -c \"<<<<<<\"'
 [color]
 	ui = auto
 [push]
@@ -33,4 +34,7 @@
 	driver = git-merge-changelog %O %A %B
 
 [diff "texinfo"]
-	funcname = ^@node[\t ][\t ]*\\([^,][^,]*\\)
+	xfuncname = ^@node[\t ][\t ]*\\([^,][^,]*\\)
+
+[transfer]
+        fsckObjects = true

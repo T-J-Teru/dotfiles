@@ -16,17 +16,23 @@
         c-electric-star
         c-indent-command
         cperl-electric-backspace
+        cperl-electric-brace
+        cperl-electric-lbrace
         cperl-electric-paren
         cperl-electric-rparen
         cperl-electric-semi
         cperl-indent-command
+        cua-copy-region
+        cua-paste
         cua-scroll-up
         delete-horizontal-space
         delete-indentation
         electric-newline-and-maybe-indent
+        fill-paragraph
         indent-for-tab-command
         jump-to-matching-paren
         kill-sentence
+        org-beginning-of-line
         org-cycle
         org-end-of-line
         org-force-self-insert
@@ -34,6 +40,7 @@
         org-kill-line
         org-self-insert-command
         overwrite-mode
+        sh-end-of-command
         tcl-electric-brace
         tcl-electric-char
         tcl-electric-hash

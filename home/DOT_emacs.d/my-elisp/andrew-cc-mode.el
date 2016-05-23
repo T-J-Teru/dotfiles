@@ -41,7 +41,7 @@
   "Pick the correct C/C++ coding style based on filename, or pick a default."
   (interactive)
   (let ((style nil))
-    
+
     ;; Pick a style based on the buffer file name.
     (if buffer-file-name
         (cond
@@ -49,7 +49,7 @@
           (setq style "broadcom/dspcontrol"))
          ((string-match "src/fp_binutils/binutils/" buffer-file-name)
           (setq style "gnu/binutils"))))
-    
+
     ;; Set the selected style, or pick a good default.
     (if (not style)
         (progn
@@ -73,11 +73,11 @@
   :group 'font-lock-faces)
 
 (defun andrew-cc-mode/printf-specifiers ()
-  (font-lock-add-keywords 
+  (font-lock-add-keywords
    nil
    '(("[^%]\\(%\\([[:digit:]]+\\$\\)?[-+' #0*]*\\([[:digit:]]*\\|\\*\\|\\*[[:digit:]]+\\$\\)\\(\\.\\([[:digit:]]*\\|\\*\\|\\*[[:digit:]]+\\$\\)\\)?\\([hlLjzt]\\|ll\\|hh\\)?\\([aAbdiuoxXDOUfFeEgGcCsSpn]\\|\\[\\^?.[^]]*\\]\\)\\)"
       1 font-lock-format-specifier-face t)
-     ("\\(%%\\)" 
+     ("\\(%%\\)"
       1 font-lock-format-specifier-face t)) ))
 
 (defun auto-complete-self-insert ()
@@ -106,7 +106,7 @@
 (defun andrew-cc-mode ()
   ;; Pick a nice code layout style.
   (andrew-cc-mode/pick-style)
-  
+
   ;; Auto newline, and hungry delete.
   (c-toggle-auto-hungry-state t)
 
@@ -134,7 +134,7 @@
   ;(require 'auto-complete)
   ;(global-auto-complete-mode t)
   ;(setq ac-auto-start 3)
-  ;(define-key ac-complete-mode-map "\M-/" 'ac-stop)  
+  ;(define-key ac-complete-mode-map "\M-/" 'ac-stop)
   )
 
 ;; Setup all my C mode styles

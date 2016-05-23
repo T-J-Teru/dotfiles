@@ -7,7 +7,11 @@
         ;; menu & tool bars.  Now we just check the
         ;; values of menu-bar-mode and tool-bar-mode.
         (menu-bar-lines . 0)
-        (tool-bar-lines . 0)))
+        (tool-bar-lines . 0)
+        (width . 80)
+        ;(font . "Liberation Mono 10")
+        (font . "Ubuntu Mono 10")
+        ))
 
 (set-scroll-bar-mode nil)
 (if (fboundp 'horizontal-scroll-bar-mode)

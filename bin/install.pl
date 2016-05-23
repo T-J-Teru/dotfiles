@@ -295,7 +295,7 @@ sub install_file {
         my $link = readlink ($dest_path);
         if ($link ne $src_path)
         {
-          die "Is a file, and a link already, but to '$link' ".
+          die "'$dest_path' is a file, and a link already, but to '$link' ".
             "not '$src_path'\n";
         }
         else

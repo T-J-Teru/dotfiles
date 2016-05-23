@@ -142,18 +142,6 @@ then BODY is evaluated.  If directory does not exist then the
 ;; cut short at the right hand edge of the screen.
 (set-default `truncate-lines t)
 
-;; Function to toggle line truncation, this is not currently bound to
-;; anything, as it's not something I do very often.
-;; TODO: Create a suitable binding for this command.
-(defun toggle-truncate-lines ()
-  "Toggle value of truncate-lines and refresh window display."
-  (interactive)
-  (setq truncate-lines (not truncate-lines))
-  ;; now refresh window display (an idiom from simple.el):
-  (save-excursion
-    (set-window-start (selected-window)
-                      (window-start (selected-window)))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Cursor Overwrite Mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

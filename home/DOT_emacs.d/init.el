@@ -526,6 +526,9 @@ removing\nany \\r characters."
 ;; Highlight the current selection.
 (transient-mark-mode t)
 
+;; Show possible keybindings
+(which-key-mode 1)
+
 ;; Setup R langauge detection and support.
 (require 'ess-site)
 

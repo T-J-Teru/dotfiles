@@ -2,6 +2,8 @@ package (>>>FILE_SANS<<<);
 
 use strict;
 use warnings;
+no indirect;
+no autovivification;
 
 =pod
 

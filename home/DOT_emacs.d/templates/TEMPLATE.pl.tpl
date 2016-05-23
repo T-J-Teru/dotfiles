@@ -2,6 +2,8 @@
 
 use warnings;
 use strict;
+no indirect;
+no autovivification;
 
 #========================================================================#
 

@@ -252,6 +252,7 @@ should have no effect."
 
 ;;============================================================================
 ;; Function that gets called from cperl-mode-hook to configure cperl-mode.
+;;;###autoload
 (defun andrew-cperl-mode ()
   ;; Load the cool pulse library from CEDET, if it's available.
   (require 'pulse nil t)

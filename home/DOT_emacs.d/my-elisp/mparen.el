@@ -1,5 +1,6 @@
 ;; Allow jumping between matching parenthesis.
 
+;;;###autoload
 (defun jump-to-matching-paren (arg)
   "Go to the matching parenthesis if on parenthesis otherwise insert a hash."
   (interactive "p")

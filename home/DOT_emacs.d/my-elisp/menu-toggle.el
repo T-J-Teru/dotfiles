@@ -1,4 +1,5 @@
 ;; Function to toggle menu and tool bars on and off.
+;;;###autoload
 (defun toggle-menubar-and-toolbar ()
   "Switches off both menu and tool bar."
   (interactive)

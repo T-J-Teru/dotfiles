@@ -102,6 +102,7 @@
 
 ;; ========================================================================
 ;; Settings for editing C/C++ files.
+;;;###autoload
 (defun andrew-cc-mode ()
   ;; Pick a nice code layout style.
   (andrew-cc-mode/pick-style)

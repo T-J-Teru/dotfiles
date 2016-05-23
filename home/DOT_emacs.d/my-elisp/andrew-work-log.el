@@ -75,6 +75,7 @@ Will only perform initialisation if the current buffer is empty."
       (setq day (1+ day))
       (setq time (encode-time 1 1 0 day month year)))))
 
+;;;###autoload
 (defun andrew-work-log/visit-log-entry (&optional date)
   "Open up work log for DATE.
 If DATE is nil, or not specified, then open the work-log for the

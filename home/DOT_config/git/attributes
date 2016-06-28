@@ -1,0 +1,3 @@
+ChangeLog       merge=merge-changelog
+ChangeLog.*     merge=merge-changelog
+*.texi*         diff=texinfo

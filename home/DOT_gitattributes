@@ -1,3 +1,1 @@
-ChangeLog       merge=merge-changelog
-ChangeLog.*     merge=merge-changelog
-*.texi*         diff=texinfo
+DOT_config/git/attributes

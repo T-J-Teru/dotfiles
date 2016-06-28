@@ -29,7 +29,7 @@ place, removing all ChangeLog patch blocks.
 
 use lib "$ENV{HOME}/lib";
 use GiveHelp qw/usage/;         # Allow -h or --help command line options.
-use Boolean;
+use boolean;
 use File::Temp qw/tempfile/;
 use File::Copy;
 use Cwd qw/abs_path/;
@@ -81,16 +81,16 @@ ChangeLog file.
 sub filter_out_changelog {
   my ($in, $out) = @_;
 
-  my $in_changelog = False;
+  my $in_changelog = false;
   while (<$in>)
   {
     if (m#^diff --git a.*/ChangeLog b.*/ChangeLog$#)
     {
-      $in_changelog = True;
+      $in_changelog = true;
     }
     elsif (m#diff --git #)
     {
-      $in_changelog = False;
+      $in_changelog = false;
     }
 
     next if ($in_changelog);

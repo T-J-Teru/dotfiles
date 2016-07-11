@@ -571,37 +571,6 @@ removing\nany \\r characters."
 (when (fboundp 'xclip-mode)
   (xclip-mode 1))
 
-;; Setup `browse-kill-ring'
-(when (require 'browse-kill-ring nil t)
-  ;; KEYBINDING: Browse the `kill-ring'.
-  (global-set-key "\C-cy" 'browse-kill-ring)
-
-  ;; Temporarily highlight inserted item.
-  (setq browse-kill-ring-highlight-inserted-item t)
-
-  ;; Highlight current choice in the kill ring buffer.
-  (setq browse-kill-ring-highlight-current-entry t)
-
-  ;; String separating entries in the `separated' style
-  (setq browse-kill-ring-separator
-        "\n--separator------------------------------")
-
-  ;; Don't allow standard navigation in kill ring buffer.
-  (define-key browse-kill-ring-mode-map
-    (kbd "<down>") 'browse-kill-ring-forward)
-  (define-key browse-kill-ring-mode-map
-    (kbd "<up>") 'browse-kill-ring-previous)
-  (define-key browse-kill-ring-mode-map
-    (kbd "<right>") 'browse-kill-ring-forward)
-  (define-key browse-kill-ring-mode-map
-    (kbd "<left>") 'browse-kill-ring-previous)
-
-  ;; Face for the separator
-  (defface browse-kill-ring-separator
-    '((t . (:inherit bold)))
-    "Face used for the separator in browse-kill-ring buffer")
-  (setq browse-kill-ring-separator-face 'browse-kill-ring-separator))
-
 ;; Activate `winner-mode' to allow for window undo and redo.
 (winner-mode 1)
 
@@ -628,6 +597,43 @@ removing\nany \\r characters."
 ;; alternative?  I'd like a version where hidden blocks are
 ;; automatically expanded upon entry.
 (require 'hideshow)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                   Setup `browse-kill-ring'
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; KEYBINDING: Browse the `kill-ring'.
+(global-set-key "\C-cy" 'browse-kill-ring)
+
+;; Settings for `browse-kill-ring-mode'.
+(add-hook
+ 'browse-kill-ring-mode-hook
+ (lambda ()
+   ;; Temporarily highlight inserted item.
+   (setq browse-kill-ring-highlight-inserted-item t)
+
+   ;; Highlight current choice in the kill ring buffer.
+   (setq browse-kill-ring-highlight-current-entry t)
+
+   ;; String separating entries in the `separated' style
+   (setq browse-kill-ring-separator
+         "\n--separator------------------------------")
+
+   ;; Don't allow standard navigation in kill ring buffer.
+   (define-key browse-kill-ring-mode-map
+     (kbd "<down>") 'browse-kill-ring-forward)
+   (define-key browse-kill-ring-mode-map
+     (kbd "<up>") 'browse-kill-ring-previous)
+   (define-key browse-kill-ring-mode-map
+     (kbd "<right>") 'browse-kill-ring-forward)
+   (define-key browse-kill-ring-mode-map
+     (kbd "<left>") 'browse-kill-ring-previous)
+
+   ;; Face for the separator
+   (defface browse-kill-ring-separator
+     '((t . (:inherit bold)))
+     "Face used for the separator in browse-kill-ring buffer")
+   (setq browse-kill-ring-separator-face 'browse-kill-ring-separator)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                Setup `notmuch' email client

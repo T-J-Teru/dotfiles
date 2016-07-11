@@ -676,7 +676,7 @@ removing\nany \\r characters."
 
 ;; Grab my customisation of core `org-mode' stuff.
 (add-hook 'org-load-hook
-          (progn
+          (lambda ()
             (require 'andrew-org)
             (require 'andrew-org-capture)))
 

@@ -661,6 +661,7 @@ removing\nany \\r characters."
 ;; Setup notmuch email system.
 (with-eval-after-load "notmuch"
   (require 'andrew-notmuch)
+  (require 'gnus)
   (add-to-list 'notmuch-show-insert-text/plain-hook
                'andrew/notmuch-decrypt-inline-pgp)
   (add-to-list 'notmuch-show-insert-text/plain-hook

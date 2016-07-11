@@ -529,9 +529,6 @@ removing\nany \\r characters."
 ;; Show possible keybindings
 (which-key-mode 1)
 
-;; Setup R langauge detection and support.
-(require 'ess-site)
-
 ;; Setup the auto-mode-alist
 ;;
 ;; I name my gdb scripts as *.gdb
@@ -634,6 +631,28 @@ removing\nany \\r characters."
      '((t . (:inherit bold)))
      "Face used for the separator in browse-kill-ring buffer")
    (setq browse-kill-ring-separator-face 'browse-kill-ring-separator)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                      Setup `R-mode'
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Loading the `ess-site' file, which is needed for `R-mode' is too
+;; expensive to do at every startup, especially how infrequently I
+;; actually edit R code.
+;;
+;; This hack gives me R mode support for *.R and *.Rd files at minimal
+;; cost.
+;;
+;; TODO: Extend the list of file extensions for which I load and
+;; activate `R-mode' to cover more of the auxiliary R file extensions.
+
+(defun andrew-r-mode ()
+  (interactive)
+  (require 'ess-site)
+  (R-mode))
+
+(add-to-list 'auto-mode-alist '("\\.R\\'" . andrew-r-mode))
+(add-to-list 'auto-mode-alist '("\\.Rd\\'" . andrew-r-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                Setup `notmuch' email client

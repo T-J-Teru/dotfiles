@@ -42,7 +42,6 @@ See the individual commands for more information."
       (newline nil t))
      (t (if indent (newline-and-indent) (newline nil t))))))
 
-
 (defun andrew-org-space ()
   "Insert a space and reindent line if it's a new heading.
 This is bound to space key, as ELECTRIC-INDENT-MODE will

@@ -680,11 +680,12 @@ removing\nany \\r characters."
             (require 'andrew-org)
             (require 'andrew-org-capture)))
 
-;; My settings to support logging work.
-(require 'andrew-work-log)
-
-;; KEYBINDING: Visit my work log.
+;; KEYBINDING: Visit my work log file.
 (global-set-key (kbd "C-c l") 'andrew-work-log/visit-log-entry)
+
+;; KEYBINDING: Access to `org-capture' and `org-agenda'.
+(define-key global-map "\C-cc" 'org-capture)
+(define-key global-map "\C-ca" 'org-agenda)
 
 ;; These settings are all about how I setup task management stuff.
 ;;

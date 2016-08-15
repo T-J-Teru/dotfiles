@@ -1,3 +1,5 @@
+(require 'org)
+
 (defvar andrew-work-log/root-dir "~/Documents/work-log")
 
 (defun andrew-work-log/log-file-path (&optional date)

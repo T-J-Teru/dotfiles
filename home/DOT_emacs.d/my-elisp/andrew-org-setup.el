@@ -1,24 +1,13 @@
-;;       Org Mode
-(require 'org)
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+;;       Org Mode Setup
 
 (setq org-directory "~/.org")
-
 (defun andrew-org-file (name)
   "Return NAME within ORG-DIRECTORY"
   (expand-file-name (concat org-directory "/" name)))
 
-(setq andrew-default-org-file (andrew-org-file "todo.org"))
-
-;; Set this to nil so the default does not get used by accident
-;; anywhere, I should be placing all my data into known locations.
-(setq org-default-notes-file nil)
-
-;; Org keybindings
-(define-key global-map "\C-cc" 'org-capture)
-(define-key global-map "\C-ca" 'org-agenda)
-
-(defun my-org-mode-hook ()
+(add-hook 'org-mode-hook 'andrew-org-mode-hook)
+(defun andrew-org-mode-hook ()
+  (message "In andrew-org-mode-hook...")
   (auto-fill-mode 1)
   (flyspell-mode 1)
   (setq org-hide-leading-stars t)
@@ -29,7 +18,12 @@
   (set-face-attribute 'org-code nil
                       :inherit 'unspecified
                       :foreground "deep sky blue"))
-(add-hook 'org-mode-hook 'my-org-mode-hook)
+
+(setq andrew-default-org-file (andrew-org-file "todo.org"))
+
+;; Set this to nil so the default does not get used by accident
+;; anywhere, I should be placing all my data into known locations.
+(setq org-default-notes-file nil)
 
 (setq org-log-into-drawer 't)
 

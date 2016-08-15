@@ -1,5 +1,4 @@
 (require 'org)
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 
 (setq andrew-org/org-directory "~/.org-v2")
 
@@ -117,10 +116,6 @@ name however, must not end in a dash or underscore."
 ;; Set this to nil so the default does not get used by accident
 ;; anywhere, I should be placing all my data into known locations.
 (setq org-default-notes-file nil)
-
-;; Org keybindings
-(define-key global-map "\C-cc" 'org-capture)
-(define-key global-map "\C-ca" 'org-agenda)
 
 (defun andrew-org/find-org-agenda-files (filename)
   "Find org files named `filename' from all projects.

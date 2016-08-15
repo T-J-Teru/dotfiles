@@ -422,6 +422,17 @@ removing\nany \\r characters."
        "Missing EMAIL environment variable, setting email to <invalid>.")
       (setq user-mail-address "<invalid>")))
 
+(with-eval-after-load "notmuch"
+  (require 'andrew-notmuch)
+  (add-to-list 'notmuch-show-insert-text/plain-hook
+               'andrew/notmuch-decrypt-inline-pgp)
+  (add-to-list 'notmuch-show-insert-text/plain-hook
+               'andrew/notmuch-verify-inline-pgp))
+
+(setq notmuch-crypto-process-mime t)
+(setq notmuch-fcc-dirs "outbox")
+(setq notmuch-search-oldest-first nil)
+
 (setq custom-file "~/.emacs.d/custom.el")
 (load-file custom-file)
 

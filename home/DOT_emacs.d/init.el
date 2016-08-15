@@ -82,7 +82,7 @@ then BODY is evaluated.  If directory does not exist then the
      (add-to-list 'load-path (concat elisp-directory "/" ,directory))
      ,@body))
 
-(add-to-load-path "cedet" (require 'cedet-devel-load))
+(add-to-load-path "cedet")
 (add-to-load-path "packages")
 (add-to-load-path "my-elisp")
 (add-to-load-path "org-mode/lisp")

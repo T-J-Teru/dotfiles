@@ -29,6 +29,7 @@
         delete-indentation
         electric-newline-and-maybe-indent
         fill-paragraph
+        forward-sentence
         indent-for-tab-command
         jump-to-matching-paren
         kill-sentence

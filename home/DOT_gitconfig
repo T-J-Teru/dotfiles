@@ -18,7 +18,7 @@
         fall=fetch --all
         lr=remote -v
         count-conflicts = !bash -c 'git diff --name-only --diff-filter=U | xargs grep -c \"<<<<<<\"'
-        brr=!bash -c \"`git for-each-ref --shell --sort='-authordate:iso8601' --format='printf \\\"%%25s\\t%%s\\n\\\" %(refname:short) %(authordate:relative)' refs/heads`\"
+        brr=!bash -c \"`git for-each-ref --shell --sort='-authordate:iso8601' --format='printf \\\"%%s %%25s\\t%%s\\n\\\" %(HEAD) %(refname:short) %(authordate:relative)' refs/heads`\"
 [color]
 	ui = auto
 [push]

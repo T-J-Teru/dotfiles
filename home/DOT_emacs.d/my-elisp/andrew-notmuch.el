@@ -135,4 +135,32 @@
    :end "-----END PGP SIGNATURE-----"
    :handler 'andrew/notmuch--verify-region))
 
+(defun andrew/notmuch-load-additional-searches (&optional filename)
+  "Load contents of FILENAME and add them to `notmuch-saved-searches'.
+
+The contents of FILENAME are loaded, and each line is treated as
+a list that defines a search as would appear in
+`notmuch-saved-searches'.  Each search is loaded and added to the
+`notmuch-saved-searches' variable.
+
+If FILENAME is not passed then the file ~/.notmuch-searchs is loaded."
+  ;; Ensure that we have a filename.
+  (unless filename
+    (setq filename "~/.notmuch-searches"))
+  ;; Load the contents of the file, and add them to the searches list.
+  (if (file-readable-p filename)
+      (with-temp-buffer
+        (insert-file-contents filename)
+        (goto-char (point-min))
+        (while
+            (not (equal (point) (point-max)))
+          (let ((start (line-beginning-position))
+                (end (line-end-position)))
+            (ignore-errors
+              (let ((lst
+                     (read-from-string
+                      (buffer-substring start end))))
+                (add-to-list 'notmuch-saved-searches (car lst) t))))
+          (forward-line)))))
+
 (provide 'andrew-notmuch)

@@ -668,7 +668,8 @@ removing\nany \\r characters."
                'andrew/notmuch-verify-inline-pgp)
   (setq notmuch-crypto-process-mime t)
   (setq notmuch-fcc-dirs "outbox")
-  (setq notmuch-search-oldest-first nil))
+  (setq notmuch-search-oldest-first nil)
+  (andrew/notmuch-load-additional-searches))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                      Org Mode Setup

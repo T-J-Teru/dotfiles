@@ -84,7 +84,7 @@ sub filter_out_changelog {
   my $in_changelog = false;
   while (<$in>)
   {
-    if (m#^diff --git a.*/ChangeLog b.*/ChangeLog$#)
+    if (m#^diff --git a.*/ChangeLog(?:\.\S+)? b.*/ChangeLog(?:\.\S+)?$#)
     {
       $in_changelog = true;
     }

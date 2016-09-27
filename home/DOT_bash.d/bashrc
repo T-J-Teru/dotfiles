@@ -350,7 +350,7 @@ function custom-cd ()
             do
               builtin cd ..
             done
-            
+
             # Record where we end up.
             local final_dir=${PWD}
 
@@ -362,6 +362,9 @@ function custom-cd ()
 
             # Lets show folk where they ended up
             show_pwd="Y"
+          else
+            echo "Unknown directory: $dir"
+            return 1
           fi
         else
           echo "Unknown directory: $dir"

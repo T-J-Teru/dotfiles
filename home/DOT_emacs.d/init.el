@@ -15,6 +15,7 @@
         (tool-bar-lines . 0)
         ;; Select a suitable font.
         ;; (font . "Liberation Mono 10")
+        ;; (font . "Monaco 10")
         (font . "Ubuntu Mono 10")
         ;; And force the startup frame width
         (width . 80)))

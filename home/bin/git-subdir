@@ -18,6 +18,7 @@ B<git-subdir> [ -h|--help ]
               [ --branches ]
               [ --update ]
               [ --status ]
+              [ --versions ]
 
 =head1 SYNOPSIS
 
@@ -105,6 +106,11 @@ use List::Util qw/max/;
 use Boolean;
 use Cwd;
 use Getopt::Long;
+use Carp::Assert;
+
+#========================================================================#
+
+my $SHA_LENGTH = 10;
 
 #========================================================================#
 
@@ -116,7 +122,6 @@ GetOptions ("colour!" => \$use_colour,
             "update" => \$update,
             "branches" => \$branches,
             "status" => \$status);
-
 
 ($update or $branches or $status) or usage ();
 
@@ -149,11 +154,13 @@ $repo_len = max ( $repo_len, 4);
 $br_len = max ($br_len, 6);
 
 printf "| %".$repo_len."s | %".$br_len."s |", "Repo", "Branch";
+printf " %".$SHA_LENGTH."s |", "SHA" if ($branches);
 print " Fetch |   FF |" if ($update);
 print " Commits | Local Ch. | Untracked |" if ($status);
 print "\n";
 
 print "+-".("-"x$repo_len)."-+-".("-"x$br_len)."-+";
+print "-".("-"x $SHA_LENGTH)."-+" if ($branches);
 print "-".("-"x 5)."-+-".("-"x 4)."-+" if ($update);
 print "-".("-"x 7)."-+-".("-"x 9)."-+-".("-"x 9)."-+" if ($status);
 print "\n";
@@ -164,6 +171,13 @@ foreach my $r (@repo)
   $br = "????" unless (defined $br);
 
   printf "| %".$repo_len."s | %".$br_len."s |", $r->{-name}, $br;
+
+  if ($branches)
+  {
+    my $sha = $r->{-sha};
+    $sha = "????" unless (defined $sha);
+    printf " %s |", $sha;
+  }
 
   if ($update)
   {
@@ -452,6 +466,47 @@ sub git_current_branch {
 
 =pod
 
+=item B<git_current_sha>
+
+Take the full path to a repository.  Try to determine the SHA for the head
+of the currently active branch in the repository and return the sha as a
+string.  If the current sha can't be determined, then return undef.
+
+The optional second parameter to this function is the length of the SHA to
+return.  This is passed on to the git command.  If this length is not
+supplied then 10 is used.
+
+To figure out the current branch the following command is used:
+
+    git rev-parse --short=LENGTH HEAD
+
+=cut
+
+sub git_current_sha {
+  my $repo = shift;
+  my $length = shift;
+
+  $length = 10 unless (defined ($length));
+  assert ($length =~ m/^\d+$/);
+
+  my $cwd = getcwd ();
+  chdir $repo or return undef;
+
+  my $sha = `git rev-parse --short=$length HEAD 2>/dev/null`;
+  if (($? != 0) || ($sha eq ""))
+  {
+    $sha = undef;
+  }
+
+  chomp $sha if (defined $sha);
+  chdir $cwd or return undef;
+  return $sha;
+}
+
+#========================================================================#
+
+=pod
+
 =item B<safe_length>
 
 Take a string parameter, and return the length.  If the string is undefined
@@ -516,10 +571,12 @@ sub find_repositories {
     if (-d "$cwd/$name/.git")
     {
       my $br = git_current_branch ("$cwd/$name");
+      my $sha = git_current_sha ("$cwd/$name", $SHA_LENGTH);
       my @remotes = git_remote_names ("$cwd/$name");
       push @repo_list, { -name => $name,
                          -path => "$cwd/$name",
                          -branch => $br,
+                         -sha => $sha,
                          -remotes => \@remotes };
     }
   }

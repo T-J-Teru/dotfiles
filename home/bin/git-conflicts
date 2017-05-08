@@ -71,6 +71,10 @@ Sort by the number of lines contained in all of the conflict regions.
 
 =back
 
+=item B<--show>=I<FILENAME>
+
+Show how I<FILENAME> was changed in the original patch.
+
 =back
 
 =cut
@@ -88,8 +92,10 @@ use Boolean;
 
 my $sorting = "none";
 my $reverse = False;
+my $show = undef;
 GetOptions ("sort=s" => \$sorting,
-            "reverse|r" => \$reverse);
+            "reverse|r" => \$reverse,
+            "show=s" => \$show);
 
 $sorting = lc ($sorting);
 ($sorting eq "none"
@@ -98,6 +104,21 @@ $sorting = lc ($sorting);
    || $sorting eq "lines")
   or die ("Invalid sorting strategy '$sorting' ".
             "(use none, filename, conflicts, or lines)\n");
+
+# Try to figure out what we might be conflicting with.
+my $conflict_with = git_find_conflicting_sha ();
+if (defined $conflict_with)
+{
+  print "Conflicting with: $conflict_with\n";
+}
+
+if (defined $show)
+{
+  (defined ($conflict_with))
+    or die "Unable to find original commit SHA";
+  system ("git show $conflict_with -- $show");
+  exit ($?);
+}
 
 print "Finding conflict files...\n";
 my @conflict_files = `git diff --name-only --diff-filter=U`;
@@ -211,6 +232,35 @@ The following methods are defined in this script.
 =over 4
 
 =cut
+
+#========================================================================#
+
+=pod
+
+=item B<git_find_conflicting_sha>
+
+Look in the .git/sequencer/todo file and return the SHA for the first
+entry, this should be the entry we're currently in conflict with.
+
+If there's no such entry, or the file does not exist then return undef.
+
+=cut
+
+sub git_find_conflicting_sha {
+  my $git_root = `git rev-parse --git-dir`;
+  chomp $git_root;
+  my $todo_file = $git_root."/sequencer/todo";
+  my $sha = undef;
+
+  if (-r $todo_file)
+  {
+    # TODO: Write this in pure perl...
+    $sha = `head -n1 $todo_file | cut -d' ' -f 2`;
+    chomp $sha;
+  }
+
+  return $sha;
+}
 
 #========================================================================#
 

@@ -195,8 +195,8 @@ function addpath
         return 1
     fi
 
-    # Remove trailing "/"
-    NP=${NP%/}
+    # Convert NP to an absolute path
+    NP=$(cd ${NP} && pwd)
 
     if [ -z $PATH ]
     then

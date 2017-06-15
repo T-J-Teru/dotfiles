@@ -67,6 +67,8 @@
        'notmuch-crypto-inline-pgp-marker)
       (let ((plain-start (point)))
         (insert plain)
+        (if (not (bolp))
+            (insert "\n"))
         (add-text-properties
          plain-start (point)
          '(face notmuch-crypto-inline-pgp-content)))
@@ -162,5 +164,50 @@ If FILENAME is not passed then the file ~/.notmuch-searchs is loaded."
                       (buffer-substring start end))))
                 (add-to-list 'notmuch-saved-searches (car lst) t))))
           (forward-line)))))
+
+(defvar andrew/notmuch-hello-sections
+  '(notmuch-hello-insert-header
+    notmuch-hello-insert-saved-searches
+    notmuch-hello-insert-search
+    notmuch-hello-insert-recent-searches
+    (notmuch-hello-insert-tags-section
+     "All tags (all mail)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter notmuch-hello-tag-list-make-query)
+    (notmuch-hello-insert-tags-section
+     "All tags (all unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (last hour/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:1h.. AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (last 6hrs/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:6h.. AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (last 12hrs/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:12h.. AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (last 24hrs/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:24h.. AND tag:unread")
+    notmuch-hello-insert-footer)
+  "The value in this variable replaces `notmuch-hello-sections'
+during startup of `notmuch'.")
 
 (provide 'andrew-notmuch)

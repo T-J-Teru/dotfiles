@@ -14,7 +14,7 @@
      (:name "sent" :query "tag:sent" :key "t" :search-type tree)
      (:name "drafts" :query "tag:draft" :key "d" :search-type tree)
      (:name "all mail" :query "*" :key "a" :search-type tree)
-     (:name "unread-threads" :query "tag:mythread and tag:unread" :search-type tree)
+     (:name "unread-threads" :query "tag:unread AND ( tag:my-thread OR tag:active-thread )" :search-type tree)
      (:name "recent-unread" :query "tag:unread AND date:2h.. AND NOT tag:buildroot" :search-type tree)
      (:name "recent-inbox" :query "tag:unread AND tag:inbox AND date:24h.." :search-type tree)
      (:name "todo" :query "tag:todo" :search-type tree))))

@@ -685,6 +685,7 @@ removing\nany \\r characters."
   (setq notmuch-crypto-process-mime t)
   (setq notmuch-fcc-dirs "outbox")
   (setq notmuch-search-oldest-first nil)
+  (setq notmuch-hello-sections andrew/notmuch-hello-sections)
   (andrew/notmuch-load-additional-searches))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

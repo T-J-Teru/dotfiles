@@ -239,8 +239,9 @@ function addpath
     return 0
 }
 
-addpath $HOME/bin
-addpath $HOME/.software/bin
+addpath --quiet $HOME/bin
+addpath --quiet $HOME/.software/bin
+addpath --quiet $HOME/texlive/2016/bin/x86_64-linux
 
 #==================================================#
 #     Setup An EMAIL Environment Variable          #

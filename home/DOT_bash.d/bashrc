@@ -174,24 +174,53 @@ xtitle ""
 export MANPATH=${MANPATH}
 export INFOPATH=${INFOPATH}:/usr/share/info
 
-# Take a directory, add it to the start of path.  If the first
-# parameter is '-end' then add the directory to the end of the
-# path instead of the beginning.
+# Take a directory, add it to the path.
+#
+# addpath [--end] [--quiet] [--] DIRECTORY
+#
+# With --end the DIRECTORY is added to the end of the PATH, otherwise
+# the DIRECTORY is added to the beginning of the PATH.
+#
+# If DIRECTORY is not a valid path then an error is given and 1 is
+# returned.  With --quiet the error is suppressed but 1 is still
+# returned.
+#
+# After adding DIRECTORY to PATH successfully then 0 is returned.
+#
 # TODO: Maybe should remove duplicate entries from the path?
 function addpath
 {
-    local NP=$1
+    local QUIET=0
+    local AT_END=0
+    while true; do
+        case "$1" in
+            -e|--end)
+                shift
+                AT_END=1
+                ;;
+            -q|--quiet)
+                shift
+                QUIET=1
+                ;;
+            --)
+                shift
+                break
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
 
-    if [ "$NP" == "-end" ]
-    then
-        AT_END=1
-        NP="$2"
-    fi
+    local NP=$1
 
     # Check it's an actual directory.
     if [ ! -d "$NP" ]
     then
-        echo "Invalid path: $NP"
+        if [ ${QUIET} == 0 ]
+        then
+            echo "addpath: unknown path: $NP"
+        fi
         return 1
     fi
 
@@ -201,7 +230,7 @@ function addpath
     if [ -z $PATH ]
     then
         PATH=$NP
-    elif [ -v AT_END ]
+    elif [ ${AT_END} == 1 ]
     then
         PATH=$PATH:$NP
     else

@@ -50,6 +50,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        about-emacs
         asm-comment
         handle-switch-frame
         sh-assignment

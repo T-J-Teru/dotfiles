@@ -226,6 +226,9 @@ function addpath
     # Convert NP to an absolute path
     NP=$(cd ${NP} && pwd)
 
+    # Resolve any relative paths
+    NP=$(cd $NP; pwd)
+
     if [ -z $PATH ]
     then
         PATH=$NP

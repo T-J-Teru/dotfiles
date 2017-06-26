@@ -128,7 +128,7 @@ function set_prompt
 
 set_prompt
 
-export WINDOW_TITLE=""
+WINDOW_TITLE=""
 
 function prompt_command
 {
@@ -501,7 +501,7 @@ function lockdir()
 {
   alias cd='dir-locked';
 
-  export LOCK_DIR_PROMPT="<\[${COLOUR_RED}\]Locked\[${COLOUR_RESET}\]>"
+  LOCK_DIR_PROMPT="<\[${COLOUR_RED}\]Locked\[${COLOUR_RESET}\]>"
   set_prompt
 }
 
@@ -509,7 +509,7 @@ function unlockdir()
 {
   alias cd='custom-cd';
 
-  export LOCK_DIR_PROMPT=""
+  LOCK_DIR_PROMPT=""
   set_prompt
 }
 

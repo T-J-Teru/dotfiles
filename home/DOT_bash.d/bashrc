@@ -122,8 +122,8 @@ source ~/.bash.d/git-prompt
 
 function set_prompt
 {
-    export PS1="${LOCK_DIR_PROMPT}${SCRIPT_PROMPT}[\[${COLOUR_GREEN}\]\h\[${COLOUR_RESET}\]]\[${PROMPT_COLOUR}\]\W\[${COLOUR_RESET}\]"'$(__git_ps1 " (%s)")> '
-    export PS2="\[${PROMPT_COLOUR}\]>\[${COLOUR_RESET}\] "
+    PS1="${LOCK_DIR_PROMPT}${SCRIPT_PROMPT}[\[${COLOUR_GREEN}\]\h\[${COLOUR_RESET}\]]\[${PROMPT_COLOUR}\]\W\[${COLOUR_RESET}\]"'$(__git_ps1 " (%s)")> '
+    PS2="\[${PROMPT_COLOUR}\]>\[${COLOUR_RESET}\] "
 }
 
 set_prompt

@@ -242,8 +242,27 @@ function addpath
 }
 
 addpath --quiet $HOME/bin
-addpath --quiet $HOME/.software/bin
 addpath --quiet $HOME/texlive/2016/bin/x86_64-linux
+
+#=======================================#
+#         Setup Default Modules         #
+#=======================================#
+
+export PACKAGE_MODULE_ROOT=$HOME/.software
+MODULES_ROOT_DIRECTORY=${PACKAGE_MODULE_ROOT}/modules
+if [ -d "${MODULES_ROOT_DIRECTORY}" ]
+then
+    DEFAULT_MODULE_LIST=""
+    for versionfile in `find ${MODULES_ROOT_DIRECTORY} -name ".version" 2>/dev/null`
+    do
+        dir=`dirname $versionfile`
+        modulename=`basename $dir`
+        DEFAULT_MODULE_LIST="${DEFAULT_MODULE_LIST} ${modulename}"
+    done
+    module -s load ${DEFAULT_MODULE_LIST} &>/dev/null
+else
+    echo "No modules directory: ${MODULES_ROOT_DIRECTORY}"
+fi
 
 #==================================================#
 #     Setup An EMAIL Environment Variable          #

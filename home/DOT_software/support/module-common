@@ -1,0 +1,49 @@
+#%Module1.0
+
+proc basic_package_setup { } {
+    global ModulesCurrentModulefile
+
+    # Find the package directory from the module file path, the path
+    # will be:
+    #     /some-root-path/modules/package-name/version-number
+    # and we need to change this into:
+    #     /some-root-path/packages/package-name/version-number
+    set pkg_dir [ string map {/modules/ /packages/} $ModulesCurrentModulefile ]
+
+    set ver [ file tail $ModulesCurrentModulefile ]
+    set pkg [ file tail [ file dirname $ModulesCurrentModulefile ] ]
+
+    if { [ file isdirectory $pkg_dir/bin ] } {
+        prepend-path PATH $pkg_dir/bin
+    }
+
+    if { [ file isdirectory $pkg_dir/man ] } {
+        prepend-path MANPATH $pkg_dir/man
+    }
+
+    if { [ file isdirectory $pkg_dir/share/man ] } {
+        prepend-path MANPATH $pkg_dir/share/man
+    }
+
+    if { [ file isdirectory $pkg_dir/info ] } {
+        prepend-path INFOPATH $pkg_dir/info
+    }
+
+    if { [ file isdirectory $pkg_dir/share/info ] } {
+        prepend-path INFOPATH $pkg_dir/share/info
+    }
+
+    if { [ file isdirectory $pkg_dir/share/info ] } {
+        prepend-path INFOPATH $pkg_dir/share/info
+    }
+
+    if { [ file isdirectory $pkg_dir/lib/pkgconfig ] } {
+        prepend-path PKG_CONFIG_PATH $pkg_dir/lib/pkgconfig
+    }
+
+    if { [ file isdirectory $pkg_dir/share/pkgconfig ] } {
+        prepend-path PKG_CONFIG_PATH $pkg_dir/share/pkgconfig
+    }
+
+    module-whatis "provides '$pkg' version '$ver'"
+}

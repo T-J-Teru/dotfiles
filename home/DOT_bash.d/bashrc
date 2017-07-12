@@ -242,7 +242,6 @@ function addpath
 }
 
 addpath --quiet $HOME/bin
-addpath --quiet $HOME/texlive/2016/bin/x86_64-linux
 
 #=======================================#
 #         Setup Default Modules         #

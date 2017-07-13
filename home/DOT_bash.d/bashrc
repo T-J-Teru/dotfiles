@@ -134,7 +134,15 @@ function prompt_command
 {
   if [ -z "${WINDOW_TITLE}" ]
   then
-    echo "-ne" "\033]0;`whoami`@${SHORT_HOSTNAME} ($PWD)\007"
+      case $TERM in
+          eterm*)
+          ;;
+          xterm*)
+              echo "-ne" "\033]0;`whoami`@${SHORT_HOSTNAME} ($PWD)\007"
+              ;;
+          *)
+              ;;
+      esac
   fi
 
   # Flush the history out.

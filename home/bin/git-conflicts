@@ -249,17 +249,30 @@ If there's no such entry, or the file does not exist then return undef.
 sub git_find_conflicting_sha {
   my $git_root = `git rev-parse --git-dir`;
   chomp $git_root;
-  my $todo_file = $git_root."/sequencer/todo";
-  my $sha = undef;
 
-  if (-r $todo_file)
+  my $cp_file = $git_root."/CHERRY_PICK_HEAD";
+  if (-r $cp_file)
   {
-    # TODO: Write this in pure perl...
-    $sha = `head -n1 $todo_file | cut -d' ' -f 2`;
+    # TODO: Write this in pure perl.
+    my $sha = `head -n1 $cp_file`;
     chomp $sha;
+    $sha = `git rev-parse --short $sha`;
+    chomp $sha;
+    return $sha;
   }
 
-  return $sha;
+  my $todo_file = $git_root."/sequencer/todo";
+  if (-r $todo_file)
+  {
+    # TODO: Write this in pure perl.
+    my $sha = `head -n1 $todo_file | cut -d' ' -f 2`;
+    chomp $sha;
+    $sha = `git rev-parse --short $sha`;
+    chomp $sha;
+    return $sha;
+  }
+
+  return undef;
 }
 
 #========================================================================#

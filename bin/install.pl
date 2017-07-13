@@ -83,6 +83,26 @@ The following methods are defined in this script.
 
 =pod
 
+=item B<ignore_file>
+
+Return true if a file should not be installed.  First parameter is the full
+path to the file (including the filename) and the second parameter is just
+the filename.
+
+=cut
+
+sub ignore_file {
+  my $full_path = shift;
+  my $filename = shift;
+
+  assert (-f $full_path);
+  return (($filename =~ m/^\./) or ($filename =~ m/~$/));
+}
+
+#========================================================================#
+
+=pod
+
 =item B<verbose>
 
 Currently undocumented.
@@ -149,6 +169,7 @@ more details.
 
 sub install_generic {
   my $src_path = $File::Find::name;
+  my $filename = $_;
   my $dest_path = src_to_dest ($src_path);
 
   # Based on the type of the source path, install the source object.
@@ -162,7 +183,10 @@ sub install_generic {
   }
   elsif (-f $src_path)
   {
-    install_file ($src_path, $dest_path);
+    if (not ignore_file ($src_path, $filename))
+    {
+      install_file ($src_path, $dest_path);
+    }
   }
   else
   {

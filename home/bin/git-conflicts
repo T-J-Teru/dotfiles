@@ -75,6 +75,11 @@ Sort by the number of lines contained in all of the conflict regions.
 
 Show how I<FILENAME> was changed in the original patch.
 
+=item B<-add>
+
+Add files that have no conflicts, but are still in the "both modified"
+state.
+
 =back
 
 =cut
@@ -93,9 +98,11 @@ use Boolean;
 my $sorting = "none";
 my $reverse = False;
 my $show = undef;
+my $do_add = False;
 GetOptions ("sort=s" => \$sorting,
             "reverse|r" => \$reverse,
-            "show=s" => \$show);
+            "show=s" => \$show,
+            "add" => \$do_add);
 
 $sorting = lc ($sorting);
 ($sorting eq "none"
@@ -114,6 +121,8 @@ if (defined $conflict_with)
 
 if (defined $show)
 {
+  (not $do_add) or
+    die "Don't use --add and --show\n";
   (defined ($conflict_with))
     or die "Unable to find original commit SHA";
   system ("git show $conflict_with -- $show");
@@ -160,6 +169,38 @@ my $max = { -filename => 8,
 
   $result;
 } @conflict_files;
+
+if ($do_add)
+{
+  my $have_added = 0;
+
+  foreach (@conflict_files)
+  {
+    if ($_->{-count} == 0)
+    {
+      $have_added++;
+      print "Adding '".$_->{-filename}."'\n";
+      system ("git add \"".$_->{-filename}."\"");
+    }
+  }
+
+  if ($have_added == 0)
+  {
+    print "No files needed adding\n";
+  }
+  else
+  {
+    # Discard all entries we just added, then drop through and show all of
+    # the remaining conflict files.
+    @conflict_files = grep { $_->{-count} != 0 } @conflict_files;
+
+    if (not @conflict_files)
+    {
+      print "No conflicts remaining.\n";
+      exit (0);
+    }
+  }
+}
 
 if ($sorting ne "none")
 {

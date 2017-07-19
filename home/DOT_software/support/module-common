@@ -33,10 +33,6 @@ proc basic_package_setup { } {
         prepend-path INFOPATH $pkg_dir/share/info
     }
 
-    if { [ file isdirectory $pkg_dir/share/info ] } {
-        prepend-path INFOPATH $pkg_dir/share/info
-    }
-
     if { [ file isdirectory $pkg_dir/lib/pkgconfig ] } {
         prepend-path PKG_CONFIG_PATH $pkg_dir/lib/pkgconfig
     }

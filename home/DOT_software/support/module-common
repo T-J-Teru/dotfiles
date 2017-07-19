@@ -47,3 +47,13 @@ proc basic_package_setup { } {
 
     module-whatis "provides '$pkg' version '$ver'"
 }
+
+proc ModulesHelp { } {
+    global ModulesCurrentModulefile
+    set ver [ file tail $ModulesCurrentModulefile ]
+    set pkg [ file tail [ file dirname $ModulesCurrentModulefile ] ]
+    set pkg_dir [ string map {/modules/ /packages/} $ModulesCurrentModulefile ]
+
+    puts stderr "This is version '$ver' of '$pkg', installed into:"
+    puts stderr "  $pkg_dir"
+}

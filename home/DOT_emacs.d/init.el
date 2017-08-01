@@ -424,12 +424,14 @@ removing\nany \\r characters."
 ;;;;                     Configure Grep
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Tweak the grep configuration to ignore backup files.
 (eval-after-load "grep"
   (lambda ()
+    ;; Tweak the grep configuration to ignore backup files.
     (grep-apply-setting
      'grep-command
-     "grep --exclude='*~' --exclude='.#*' -IHn -e ")))
+     "grep --exclude='*~' --exclude='.#*' -IHn -e ")
+    ;; Turn on highlight line in the results buffer.
+    (add-hook 'grep-mode-hook (lambda () (hl-line-mode 1)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Configure avy Package

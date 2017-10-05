@@ -683,6 +683,7 @@ HISTSIZE=32768	     # save this many lines in the run-time history
 unset HISTFILESIZE	     # no maximum size of history file
 HISTFILE=$HOME/.hist/`uname -n`/$$
 [ -d $(dirname ${HISTFILE}) ] || mkdir -p $(dirname ${HISTFILE})
+rm -f $HISTFILE   # Nuke old history for this PID.
 touch $HISTFILE
 LAST_CWD=$PWD
 HISTCONTROL=ignoredups     # don't save history identical to previous lines

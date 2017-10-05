@@ -41,6 +41,14 @@ proc basic_package_setup { } {
         prepend-path PKG_CONFIG_PATH $pkg_dir/share/pkgconfig
     }
 
+    if { [ file isdirectory $pkg_dir/include ] } {
+        prepend-path CPATH $pkg_dir/include
+    }
+
+    if { [ file isdirectory $pkg_dir/lib/python2.7/site-packages ] } {
+        prepend-path PYTHONPATH $pkg_dir/lib/python2.7/site-packages
+    }
+
     module-whatis "provides '$pkg' version '$ver'"
 }
 

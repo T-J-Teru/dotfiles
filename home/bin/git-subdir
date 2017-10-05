@@ -176,7 +176,7 @@ foreach my $r (@repo)
   {
     my $sha = $r->{-sha};
     $sha = "????" unless (defined $sha);
-    printf " %s |", $sha;
+    printf " %".$SHA_LENGTH."s |", $sha;
   }
 
   if ($update)

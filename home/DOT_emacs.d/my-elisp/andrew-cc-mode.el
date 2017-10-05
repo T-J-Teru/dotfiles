@@ -104,9 +104,6 @@
 ;; Settings for editing C/C++ files.
 ;;;###autoload
 (defun andrew-cc-mode ()
-  ;; Ensure cedet configuration is loaded.
-  (require 'cedet-devel-load)
-
   ;; Pick a nice code layout style.
   (andrew-cc-mode/pick-style)
 

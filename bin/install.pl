@@ -237,25 +237,22 @@ sub install_symlink {
     {
       my $dest_link = filter_dest_path ($src_link);
 
-      if (-e $dest_path)
+      if (-l $dest_path)
       {
-        if (-l $dest_path)
-        {
-          my $curr_dest_link = readlink ($dest_path);
-          if ($curr_dest_link ne $dest_link)
-          {
-            die "Destination '$dest_path' already exists, ".
+        my $curr_dest_link = readlink ($dest_path);
+	if ($curr_dest_link ne $dest_link)
+	{
+          die "Destination '$dest_path' already exists, ".
               "but is a symlink to '$curr_dest_link' not '$dest_link'";
-          }
-          else
-          {
-            verbose ("  symlink already exists.\n");
-          }
-        }
-        else
-        {
-          die "Destination '$dest_path' already exists, but is not a symlink";
-        }
+	}
+	else
+	{
+          verbose ("  symlink already exists.\n");
+	}
+      }
+      elsif (-e $dest_path)
+      {
+        die "Destination '$dest_path' already exists, but is not a symlink";
       }
       else
       {

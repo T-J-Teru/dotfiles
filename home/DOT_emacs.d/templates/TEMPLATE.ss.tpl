@@ -1,4 +1,4 @@
-#! /projects/firepath_work/aburgess/software/.install/bin/guile-1.8.8 \
+#! guile
 -s
 !#
 

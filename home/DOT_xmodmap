@@ -1,0 +1,6 @@
+! Make the Caps_Lock key be another Control_L.
+! After this there is no longer a Caps_Lock key,
+! no great loss there!
+remove Lock = Caps_Lock
+keysym Caps_Lock = Control_L
+add Control = Control_L

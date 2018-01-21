@@ -108,6 +108,7 @@ sub parse_changelog_hunks_from_last_commit {
         die "Found file '$1' twice in the diff";
       $current_hunk_list = [];
       $changelogs {$1} = $current_hunk_list;
+      $current_hunk = undef;
     }
     elsif (m#^diff --git #)
     {

@@ -756,3 +756,9 @@ export PATH="$HOME/perl5/bin:$PATH";
 #===============================#
 
 export PYTHONUSERBASE=$HOME/.python
+
+#=====================================================================
+
+# Local Variables:
+# mode: sh
+# End:

@@ -372,8 +372,8 @@ function custom-cd ()
   local show_pwd="N"
 
   local prevTen=`fc -ln -10 2>/dev/null | egrep -c " +cd"`;
-  if [[ $prevTen -eq 0 ]]; 
-  then 
+  if [[ $prevTen -eq 0 ]];
+  then
     show_pwd="Y"
   fi
 

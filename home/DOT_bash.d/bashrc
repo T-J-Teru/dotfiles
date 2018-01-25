@@ -1,6 +1,39 @@
 # .bashrc
 
 #=====================================#
+#       Keyring Related Setup         #
+#=====================================#
+
+# This starting of gnome-keyring-daemon has been in my config for a
+# while, and I'm not sure if it's really a good thing or not.
+#
+# TODO: Figure out the relationship between gnome-keyring-daemon and
+# ssh-agent, and how these two can best work together.
+#
+# For now, disable use of gnome-keyring-daemon, and see if bad stuff
+# happens.
+# if [ "$DISPLAY" ]
+# then
+#     export $(gnome-keyring-daemon -s)
+# fi
+
+# Query ssh-agent for available keys.  If no agent is available, then
+# source an existing agent setup.  If there is no available agent
+# setup, then start and agent, and store the settings.
+ssh-add -l &>/dev/null
+if [ "$?" == 2 ]; then
+  test -r ~/.ssh-agent && \
+    eval "$(<~/.ssh-agent)" >/dev/null
+
+  ssh-add -l &>/dev/null
+  if [ "$?" == 2 ]; then
+    (umask 066; ssh-agent > ~/.ssh-agent)
+    eval "$(<~/.ssh-agent)" >/dev/null
+    ssh-add
+  fi
+fi
+
+#=====================================#
 #     Check for interactive shell     #
 #=====================================#
 

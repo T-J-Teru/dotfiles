@@ -23,8 +23,10 @@
         cperl-electric-semi
         cperl-indent-command
         cua-copy-region
+        cua-delete-region
         cua-paste
         cua-scroll-up
+        dabbrev-expand
         delete-horizontal-space
         delete-indentation
         electric-newline-and-maybe-indent
@@ -53,5 +55,6 @@
         about-emacs
         asm-comment
         handle-switch-frame
+        mouse-set-region
         sh-assignment
         ))

@@ -80,7 +80,7 @@
      ("\\(%%\\)"
       1 font-lock-format-specifier-face t)) ))
 
-(defun auto-complete-self-insert ()
+(defun andrew/complete-self-insert ()
   (interactive)
   (self-insert-command 1)
   (auto-complete))
@@ -95,8 +95,8 @@
   (semantic-highlight-func-mode)
 
   (local-set-key "\C-cj" 'semantic-ia-fast-jump)
-  (local-set-key "." 'auto-complete-self-insert)
-  (local-set-key ">" 'auto-complete-self-insert)
+  (local-set-key "." 'andrew/complete-self-insert)
+  (local-set-key ">" 'andrew/complete-self-insert)
 
   (add-to-list 'ac-sources 'ac-source-semantic))
 

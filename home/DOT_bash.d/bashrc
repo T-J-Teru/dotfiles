@@ -50,6 +50,9 @@ alias emacs-nw='emacs -nw'
 alias getmail='getmail -nl'
 alias grep='grep --color=auto -I --exclude="*~"'
 
+alias pgrep='pgrep -f'
+alias pkill='pkill -f'
+
 [ -e "$HOME/.dircolors" ] && DIR_COLORS="$HOME/.dircolors"
 [ -e "$DIR_COLORS" ] || DIR_COLORS=""
 eval "`dircolors -b $DIR_COLORS`"

@@ -16,14 +16,15 @@ git-update-changelogs - Patch ChangeLog dates in most recent commit.
 =head1 OPTIONS
 
 B<git-update-changelogs> [-h|--help]
-                        [--fix-last-commit]
-                        [--no-commit]
-                        [--date=DATE]
-                        [<upstream>]
+                         [--fix-last-commit]
+                         [--no-commit]
+                         [--date=DATE]
+                         [<upstream>]
 
 =head1 SYNOPSIS
 
-A full description for git-update-changelogs has not yet been written.
+All commits on the current branch but not in <upstream> will have their
+new ChangeLog entries updated; the date will be modified to todays date.
 
 =cut
 
@@ -143,7 +144,14 @@ sub parse_changelog_hunks_from_last_commit {
 
 =item B<fix_last_commit>
 
-Currently undocumented.
+Takes a hash-reference containing command line config settings.
+
+This function assumes that the current working directory is the repository
+root.
+
+The last commit is updated, the dates in any modified ChangeLogs are
+updated to the date string passed in within the command line settings
+hash-reference.
 
 =cut
 
@@ -314,7 +322,15 @@ sub parse_command_line {
 
 =item B<update_changelog_hunk>
 
-Currently undocumented.
+Takes hash-reference containing command line options, a filename for a
+ChangeLog file to update, and a hunk, which is a array-reference containing
+strings, that are the line of the diff hunk.
+
+The ChangeLog file passed in the filename is rewritten with the date
+updated if the hunk contains a line that requires updating.
+
+If the command line options allow it then the updated ChangeLog file is
+committed.
 
 =cut
 

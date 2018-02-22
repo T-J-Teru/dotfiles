@@ -1,0 +1,25 @@
+#! /bin/bash
+
+# Print the names of branches and the time since the branch was last
+# modified.
+#
+# By default, only prints local branches, but with '-a' command line
+# option prints all branches.
+#
+# This replaces this alias:
+#
+#    brr=!bash -c \"`git for-each-ref --shell --sort='-authordate:iso8601' --format='printf \\\"%%s %%25s\\t%%s\\n\\\" %(HEAD) %(refname:short) %(authordate:relative)' refs/heads`\"
+#
+# But extends it to add support for the '-a' command line option.
+
+REF_LIST=refs/heads
+if [ "x${1}" == "x-a" ]
+then
+    REF_LIST="${REF_LIST} refs/remotes"
+fi
+
+STR=`git for-each-ref --shell \
+                  --sort='-authordate:iso8601' \
+                  --format='printf "%%s %%25s\\t%%s\\n" %(HEAD) %(refname:short) %(authordate:relative);' \
+                  ${REF_LIST}`
+eval "$STR"

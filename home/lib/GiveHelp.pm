@@ -23,7 +23,7 @@ using the variable $0.
 #========================================================================#
 
 use Getopt::Long;
-use Boolean;
+use boolean;
 use Pod::Usage;
 use File::Basename;
 
@@ -68,7 +68,7 @@ Check for command line arguments.
 =cut
 
 sub BEGIN {
-  my $help = False;
+  my $help = false;
 
   Getopt::Long::Configure('pass_through');
   GetOptions('help|h' => \$help);

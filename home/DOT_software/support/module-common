@@ -49,6 +49,10 @@ proc basic_package_setup { } {
         prepend-path PYTHONPATH $pkg_dir/lib/python2.7/site-packages
     }
 
+    if { [ file isdirectory $pkg_dir/lib/perl5 ] } {
+        prepend-path PERL5LIB $pkg_dir/lib/perl5
+    }
+
     module-whatis "provides '$pkg' version '$ver'"
 }
 

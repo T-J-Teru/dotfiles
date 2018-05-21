@@ -314,14 +314,20 @@ removing\nany \\r characters."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Setup the users email address by pulling it from the EMAIL
-;; environment variable.  Gives a warning if the EMAIL environment
-;; variable is not set.
+;; environment variable.  If the environment variable is not set, then
+;; try to pull the email from git.  If we still don't have a valid
+;; email, then give up, and show a warning to the user.
 (if (not (getenv "EMAIL"))
-    (progn
-      (display-warning
-       :warning
-       "Missing EMAIL environment variable, setting email to <invalid>.")
-      (setq user-mail-address "<invalid>")))
+    (let ((email (shell-command-to-string
+                  "git config user.email 2>/dev/null")))
+      (if (> (length email) 0)
+          (setq user-mail-address
+                (replace-regexp-in-string "[ \t\n]*\\'" "" email))
+        (progn
+          (display-warning
+           :warning
+           "Missing EMAIL environment variable, setting email to <invalid>.")
+          (setq user-mail-address "<invalid>")))))
 
 ;; Load my email related settings after loading the sendmail package.
 (eval-after-load "sendmail"

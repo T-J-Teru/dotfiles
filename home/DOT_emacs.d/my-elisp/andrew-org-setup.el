@@ -1,6 +1,6 @@
 (require 'org)
 
-(setq andrew-org/org-directory "~/.org-v2")
+(setq andrew-org/org-directory "~/.org")
 
 (defun andrew-org/project-directory (project)
   "Return path to directory for project PROJECT"

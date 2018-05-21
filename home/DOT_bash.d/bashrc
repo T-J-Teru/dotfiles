@@ -284,6 +284,27 @@ function addpath
 
 addpath --quiet $HOME/bin
 
+function rmpath () {
+    local target=$1
+    target=$(cd $target && pwd)
+
+    new_path=
+    while IFS= read -rd: dir; do
+        if [ "$dir" != "$target" ]
+        then
+            if [ -z "$new_path" ]
+            then
+                new_path=$dir
+            else
+                new_path=$new_path:$dir
+            fi
+        fi
+    done < <(printf %s "$PATH")
+
+    PATH=$new_path
+    return 0
+}
+
 #=======================================#
 #         Setup Default Modules         #
 #=======================================#

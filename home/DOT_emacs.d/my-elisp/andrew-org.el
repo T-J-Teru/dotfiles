@@ -56,4 +56,9 @@ easier."
 
 (define-key org-mode-map (kbd "<SPC>") 'andrew-org-space)
 
+(defun org-unschedule ()
+  "Remove the SCHEDULED: string from a TODO item."
+  (interactive)
+  (org-schedule '(4)))
+
 (provide 'andrew-org)

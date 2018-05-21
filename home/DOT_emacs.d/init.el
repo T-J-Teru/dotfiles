@@ -714,6 +714,7 @@ removing\nany \\r characters."
 (define-key global-map "\C-ca" 'org-agenda)
 
 (require 'andrew-org-setup)
+(require 'andrew-work-log)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                      Customisation

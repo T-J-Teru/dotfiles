@@ -206,6 +206,48 @@ If FILENAME is not passed then the file ~/.notmuch-searchs is loaded."
      :initially-hidden (not notmuch-show-all-tags-list)
      :hide-tags notmuch-hello-hide-tags
      :filter "date:24h.. AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (last 7 days/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:7d.. AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (14 -> 7 days ago/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:14d..7d AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (21 -> 14 days ago/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:21d..14d AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (last month/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:1M.. AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (last 2 months/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:2M.. AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (last 3 months/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:3M.. AND tag:unread")
+    (notmuch-hello-insert-tags-section
+     "All tags (last 6 months/unread)"
+     :search-type tree
+     :initially-hidden (not notmuch-show-all-tags-list)
+     :hide-tags notmuch-hello-hide-tags
+     :filter "date:6M.. AND tag:unread")
     notmuch-hello-insert-footer)
   "The value in this variable replaces `notmuch-hello-sections'
 during startup of `notmuch'.")

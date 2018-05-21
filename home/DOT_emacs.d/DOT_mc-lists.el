@@ -4,8 +4,10 @@
 (setq mc/cmds-to-run-for-all
       '(
         andrew-org-space
+        andrew/complete-self-insert
         asm-colon
         auto-complete-self-insert
+        beginning-of-buffer
         c-electric-brace
         c-electric-colon
         c-electric-lt-gt
@@ -15,6 +17,7 @@
         c-electric-slash
         c-electric-star
         c-indent-command
+        c-indent-line-or-region
         cperl-electric-backspace
         cperl-electric-brace
         cperl-electric-lbrace

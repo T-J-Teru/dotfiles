@@ -713,19 +713,7 @@ removing\nany \\r characters."
 (define-key global-map "\C-cc" 'org-capture)
 (define-key global-map "\C-ca" 'org-agenda)
 
-;; These settings are all about how I setup task management stuff.
-;;
-;; I'm in the process of rewritting all of this stuff.  When the
-;; environment variable is set I pull in the "under-development"
-;; version of the settings.
-;;
-;; TODO: This needs to be split into the parts that need to be loaded
-;; at configuration time, and the parts that can be deferred, and
-;; loaded as part of the `org-mode-hook', this would speed up emacs
-;; startup.
-(if (getenv "ANDREW_ORG_V2")
-    (require 'andrew-org-v2-setup)
-  (require 'andrew-org-setup))
+(require 'andrew-org-setup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                      Customisation

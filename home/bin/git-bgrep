@@ -1,0 +1,84 @@
+#! /bin/bash
+
+# Print the names of branches and the time since the branch was last
+# modified.  This is an extension of the git-brr command that provides
+# pattern filtering.
+#
+# Usage is:
+#
+#    git bgrep [<remote-name>] <pattern>
+#    git bgrep -a <pattern>
+#
+# The <remote-name> and `-a` flags are optional.  If these are not
+# given then local branches matching <pattern> are listed.
+#
+# With <remote-name> then branches from the specified remote matching
+# pattern are listed.
+#
+# With `-a` then branches from all remotes matching pattern are
+# listed.
+#
+# This replaces this alias:
+#
+#    brr=!bash -c \"`git for-each-ref --shell --sort='-authordate:iso8601' --format='printf \\\"%%s %%25s\\t%%s\\n\\\" %(HEAD) %(refname:short) %(authordate:relative)' refs/heads`\"
+#
+# But provides pattern matching, and the -a flag as extensions.
+#
+# TODO:
+# =====
+#
+#  1. Would be nice if we could specify multiple remote names, maybe
+#     comma separated.
+#
+#  2. Would be nice if we could specify multiple patterns, maybe just
+#     list as many patterns as needed at the end of the line.
+#
+#  3. Currently, to get the exact 'git brr' behaviour I have to do
+#     this 'git bgrep \*', maybe if not remote or pattern is given
+#     then list all local branches.
+
+function error () {
+    echo "$@"
+    exit 1
+}
+
+if [[ $# < 1 || $# > 2 ]]
+then
+    error "git bgrep [remote] PATTERN"
+fi
+
+if [ $# == 1 ]
+then
+    remote=""
+    pattern=$1
+else
+    remote=$1
+    pattern=$2
+fi
+
+if [ -n "${remote}" ]
+then
+    if [ "x${remote}" == "x-a" ]
+    then
+        REF_LIST=refs/remotes/*/${pattern}*
+    else
+        if [ ! -d ".git/refs/remotes/${remote}" ]
+        then
+            error "Unknon remote: ${remote}"
+        fi
+        REF_LIST=refs/remotes/${remote}/${pattern}*
+    fi
+else
+    REF_LIST=refs/heads/${pattern}*
+fi
+
+# Calculate the length of the longest refname we are going to print.
+LONGEST_REF_LEN=`git for-each-ref --format='%(refname:short)' ${REF_LIST} | wc -L`
+
+# And build up a string of shell to print the output, then eval the
+# string to produce formatted output.
+STR=`git for-each-ref --shell \
+                  --sort='-authordate:iso8601' \
+                  --format='printf "%%s %%${LONGEST_REF_LEN}s\\t%%s\\n" %(HEAD) %(refname:short) %(authordate:relative);' \
+                  ${REF_LIST}`
+eval "$STR"

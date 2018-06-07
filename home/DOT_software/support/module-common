@@ -13,6 +13,12 @@ proc basic_package_setup { } {
     set ver [ file tail $ModulesCurrentModulefile ]
     set pkg [ file tail [ file dirname $ModulesCurrentModulefile ] ]
 
+    module-whatis "provides '$pkg' version '$ver'"
+
+    #
+    # General setup for all packages.
+    #
+
     if { [ file isdirectory $pkg_dir/bin ] } {
         prepend-path PATH $pkg_dir/bin
     }
@@ -53,7 +59,15 @@ proc basic_package_setup { } {
         prepend-path PERL5LIB $pkg_dir/lib/perl5
     }
 
-    module-whatis "provides '$pkg' version '$ver'"
+    #
+    # Package specific setup tasks.
+    #
+
+    if { $pkg == "automake" } {
+       foreach dir [glob -type d $pkg_dir/share/aclocal-*] {
+           prepend-path ACLOCAL_PATH $dir
+       }
+    }
 }
 
 proc ModulesHelp { } {
@@ -65,3 +79,7 @@ proc ModulesHelp { } {
     puts stderr "This is version '$ver' of '$pkg', installed into:"
     puts stderr "  $pkg_dir"
 }
+
+# Local Variables:
+# mode: tcl
+# End:

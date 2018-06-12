@@ -140,6 +140,15 @@ if (not @conflict_files)
 
 print "Found ". scalar (@conflict_files) ." files with conflicts.\n";
 
+# Make sure that we're in the root of the repository.
+my $root_dir = `git rev-parse --show-toplevel`;
+chomp $root_dir;
+if ((not ( -d $root_dir )) or (not (chdir $root_dir)))
+{
+  print "Could not change to root directory: $root_dir";
+  exit (1);
+}
+
 # Initial values based on the strings that are used as headers in each
 # column.
 my $max = { -filename => 8,

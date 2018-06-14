@@ -75,10 +75,16 @@ fi
 # Calculate the length of the longest refname we are going to print.
 LONGEST_REF_LEN=`git for-each-ref --format='%(refname:short)' ${REF_LIST} | wc -L`
 
+# The author date is when the patch was originall authored, while the
+# committerdate reflect when the patch was last committed.
+#
+# datetype=authordate
+datetype=committerdate
+
 # And build up a string of shell to print the output, then eval the
 # string to produce formatted output.
 STR=`git for-each-ref --shell \
-                  --sort='-authordate:iso8601' \
-                  --format='printf "%%s %%${LONGEST_REF_LEN}s\\t%%s\\n" %(HEAD) %(refname:short) %(authordate:relative);' \
+                  --sort="-${datetype}:iso8601" \
+                  --format="printf \\"%%s %%${LONGEST_REF_LEN}s\\t%%s\\n\\" %(HEAD) %(refname:short) %(${datetype}:relative);" \
                   ${REF_LIST}`
 eval "$STR"

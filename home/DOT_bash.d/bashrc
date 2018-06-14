@@ -73,6 +73,7 @@ alias ls='ls --color=auto -CFv'
 alias ll='ls -loF'
 alias la='ls -loaF'
 alias lt='ls --sort=time'
+alias llt='ls -loF --sort=time'
 
 alias tree='tree -v'
 

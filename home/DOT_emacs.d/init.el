@@ -257,15 +257,14 @@ removing\nany \\r characters."
 ;;;;                 Tracking Position Of Point
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; When active `winpoint-mode' tracks the position of point per
-;; window, rather than per-buffer.  This means that if two windows (W1
-;; and W2) are both visiting buffer A, and they have different values
-;; for `point', then in one window (W1) switches to buffer B and then
-;; back to buffer A, the value for `point' in W1 will be preserved.
-;; The standard behaviour is that when W1 revisits buffer A it would
-;; take on the value of `point' from W2.
-(when (require 'winpoint nil t)
-  (winpoint-mode 1))
+;; When active emacs tracks the position of point per window, rather
+;; than per-buffer.  This means that if two windows (W1 and W2) are
+;; both visiting buffer A, and they have different values for `point',
+;; then in one window (W1) switches to buffer B and then back to
+;; buffer A, the value for `point' in W1 will be preserved.  The
+;; standard behaviour is that when W1 revisits buffer A it would take
+;; on the value of `point' from W2.
+(setq switch-to-buffer-preserve-window-point t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                       Line Numbering

@@ -249,7 +249,7 @@ removing\nany \\r characters."
 ;; TODO: Not sure if this is the best way to configure faces these
 ;; days.
 (if (display-graphic-p)
-    (set-face-attribute 'show-paren-mismatch-face
+    (set-face-attribute 'show-paren-mismatch
                         nil
                         :strike-through "red"))
 

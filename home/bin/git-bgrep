@@ -66,7 +66,11 @@ then
         then
             error "Unknon remote: ${remote}"
         fi
-        REF_LIST=refs/remotes/${remote}/${pattern}*
+        if [[ ! "${pattern}" =~ \*$ ]]
+        then
+            pattern="${pattern}*"
+        fi
+        REF_LIST=refs/remotes/${remote}/${pattern}
     fi
 else
     REF_LIST=refs/heads/${pattern}*

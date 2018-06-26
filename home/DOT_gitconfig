@@ -7,8 +7,8 @@
 	co=checkout
 	br=branch
 	ff=ff-merge
-	lg=log --graph --pretty=format:"%C(auto)%h%C(auto)%d\\ %Creset%s%Cblue\\ [%an\\ (%cr)]"
-	slg=log --simplify-by-decoration --full-history --graph --pretty=format:"%C(yellow)%h%Cred%d%Creset"
+	lg=log --graph --pretty=format:"%C(auto)%h%d\\ %C(reset)%s%C(blue)\\ [%an\\ (%cr)]%C(reset)"
+	slg=log --simplify-by-decoration --full-history --graph --pretty=format:"%C(auto)%h%C(red)%d%C(reset)"
 	oldest-ancestor = !bash -c 'diff --old-line-format= --new-line-format= <(git rev-list --first-parent \"${1:-master}\") <(git rev-list --first-parent \"${2:-HEAD}\") | head -1' -
         edit-conflicts = !bash -c 'git diff --name-only --diff-filter=U | xargs emacs'
         ec=!bash -c 'git edit-conflicts'

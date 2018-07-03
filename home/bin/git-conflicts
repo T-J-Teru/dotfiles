@@ -322,6 +322,17 @@ sub git_find_conflicting_sha {
     return $sha;
   }
 
+  my $rebase_file = $git_root."/rebase-apply/original-commit";
+  if (-r $rebase_file)
+  {
+    # TODO: Write this in pure perl.
+    my $sha = `head -n1 $rebase_file`;
+    chomp $sha;
+    $sha = `git rev-parse --short $sha`;
+    chomp $sha;
+    return $sha;
+  }
+
   return undef;
 }
 

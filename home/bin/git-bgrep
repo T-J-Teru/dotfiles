@@ -62,7 +62,7 @@ then
     then
         REF_LIST=refs/remotes/*/${pattern}*
     else
-        if [ ! -d ".git/refs/remotes/${remote}" ]
+        if [ $( ls -1d .git/refs/remotes/${remote} 2>/dev/null | wc -l ) -eq 0 ]
         then
             error "Unknon remote: ${remote}"
         fi

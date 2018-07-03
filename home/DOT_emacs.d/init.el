@@ -364,8 +364,19 @@ removing\nany \\r characters."
 ;;;;                       Buffer Killing
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; KEYBINDING: Use `kill-this-buffer' for killing buffers.
-(global-set-key (kbd "C-x k") 'kill-this-buffer)
+(defun kill-buffer-now ()
+  "Kill the current buffer without asking.
+When called in the minibuffer, get out of the minibuffer
+using `abort-recursive-edit'."
+  (interactive)
+  (cond
+   ((not (window-minibuffer-p (get-buffer-window (current-buffer))))
+    (kill-buffer (current-buffer)))
+   (t
+    (abort-recursive-edit))))
+
+;; KEYBINDING: Use `kill-buffer-now' for killing buffers.
+(global-set-key (kbd "C-x k") 'kill-buffer-now)
 
 ;; KEYBINDING: And set up a binding for `kill-buffer' too.
 (global-set-key (kbd "C-x K") 'kill-buffer)

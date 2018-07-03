@@ -286,6 +286,21 @@ current buffer."
                       :foreground "deep sky blue"))
 
 (defun andrew-org/agenda-mode-hook ()
+  (setq header-line-format
+        (substitute-command-keys
+         "Filter by category: '\\[org-agenda-filter-by-category]', \
+Remove filter: '\\[org-agenda-filter-remove-all]'"))
+
+  (insert
+   (substitute-command-keys "\
+Filter by:
+  category	\\[org-agenda-filter-by-category]
+  regexp	\\[org-agenda-filter-by-regexp]
+  tag		\\[org-agenda-filter-by-tag]
+
+  remove all	\\[org-agenda-filter-remove-all]
+
+"))
   (hl-line-mode 1))
 
 ;; Register hooks

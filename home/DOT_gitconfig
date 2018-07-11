@@ -18,7 +18,7 @@
         fall=fetch --all
         lr=remote -v
         count-conflicts = !bash -c 'git diff --name-only --diff-filter=U | xargs grep -c \"<<<<<<\"'
-        brr=bgrep \\*
+        brr = !bash -c "f() { git bgrep $@ \\*;  }; f"
 
 [color]
 	ui = auto

@@ -60,7 +60,7 @@ if [ -n "${remote}" ]
 then
     if [ "x${remote}" == "x-a" ]
     then
-        REF_LIST=refs/remotes/*/${pattern}*
+        REF_LIST="refs/remotes/*/${pattern}* refs/heads/${pattern}*"
     else
         if [ $( ls -1d .git/refs/remotes/${remote} 2>/dev/null | wc -l ) -eq 0 ]
         then

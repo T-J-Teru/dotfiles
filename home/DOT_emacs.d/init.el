@@ -539,6 +539,7 @@ using `abort-recursive-edit'."
 
 ;; KEYBINDING: Activate multiple cursors mode.
 (global-set-key (kbd "C-c e") 'mc/edit-lines)
+(global-set-key (kbd "C-c ?") 'ace-mc-add-char)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                     Header Line

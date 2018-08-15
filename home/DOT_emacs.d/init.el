@@ -694,6 +694,7 @@ using `abort-recursive-edit'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Setup notmuch email system.
+(autoload 'notmuch "notmuch" "Notmuch mail" t)
 (with-eval-after-load "notmuch"
   (require 'andrew-notmuch)
   (require 'gnus)

@@ -304,6 +304,7 @@ Filter by:
   (hl-line-mode 1))
 
 ;; Register hooks
+(add-hook 'org-agenda-mode-hook 'andrew-org/org-mode-hook)
 (add-hook 'org-agenda-mode-hook 'andrew-org/agenda-mode-hook)
 (add-hook 'org-mode-hook 'andrew-org/org-mode-hook)
 

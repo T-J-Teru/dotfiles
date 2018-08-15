@@ -333,6 +333,17 @@ sub git_find_conflicting_sha {
     return $sha;
   }
 
+  my $rebase_sha = $git_root."/rebase-merge/stopped-sha";
+  if (-r $rebase_sha)
+  {
+    # TODO: Write this in pure perl.
+    my $sha = `head -n1 $rebase_sha`;
+    chomp $sha;
+    $sha = `git rev-parse --short $sha`;
+    chomp $sha;
+    return $sha;
+  }
+
   return undef;
 }
 

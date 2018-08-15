@@ -56,24 +56,25 @@ else
     pattern=$2
 fi
 
+if [[ ! "${pattern}" =~ \*$ ]]
+then
+    pattern="${pattern}*"
+fi
+
 if [ -n "${remote}" ]
 then
     if [ "x${remote}" == "x-a" ]
     then
-        REF_LIST="refs/remotes/*/${pattern}* refs/heads/${pattern}*"
+        REF_LIST="refs/remotes/*/${pattern} refs/heads/${pattern}"
     else
         if [ $( ls -1d .git/refs/remotes/${remote} 2>/dev/null | wc -l ) -eq 0 ]
         then
             error "Unknon remote: ${remote}"
         fi
-        if [[ ! "${pattern}" =~ \*$ ]]
-        then
-            pattern="${pattern}*"
-        fi
         REF_LIST=refs/remotes/${remote}/${pattern}
     fi
 else
-    REF_LIST=refs/heads/${pattern}*
+    REF_LIST=refs/heads/${pattern}
 fi
 
 # Calculate the length of the longest refname we are going to print.

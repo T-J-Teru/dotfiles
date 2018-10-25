@@ -261,7 +261,8 @@ current buffer."
   (setq org-hide-emphasis-markers t)
   (setq org-ditaa-jar-path "/usr/share/java/ditaa.jar")
   ;; Rebuild the list of agenda files.
-  (andrew-org/rebuild-org-agenda-files)
+  (if (not (org-agenda-files))
+      (andrew-org/rebuild-org-agenda-files))
   ;; Place notes and timestamps into a draw.  Keeps the clutter down.
   (setq org-log-into-drawer 't)
   ;; Can't mark a parent as DONE until all its children are DONE.

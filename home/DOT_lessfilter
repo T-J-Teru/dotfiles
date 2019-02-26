@@ -1,0 +1,28 @@
+#! /bin/sh
+
+function do_colour () {
+        pygmentize -g "$1"
+        exit $?
+}
+
+case "$1" in
+    *.c|*.sh|*.cc|*.cpp|*.h|*.H|*.pl|*.py|*.R)
+        do_colour "$1"
+        ;;
+    ?*.*)
+        exit 1
+        ;;
+    *)
+        break
+        ;;
+esac
+
+type=$(file -b -L -i $1)
+case $type in
+    text/x-shellscript\;*|text/x-perl\;*|text/x-python\;*)
+        do_colour "$1"
+        ;;
+    *)
+        exit 1
+        ;;
+esac

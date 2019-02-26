@@ -92,6 +92,7 @@ alias pkill='pkill -f'
 eval "`dircolors -b $DIR_COLORS`"
 
 export LESS="-S -R -i"
+export LESSOPEN="||/usr/bin/lesspipe.sh %s"
 
 export SHORT_HOSTNAME=$HOSTNAME
 

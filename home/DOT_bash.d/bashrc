@@ -737,7 +737,7 @@ function tool_check ()
 
 HISTSIZE=32768	     # save this many lines in the run-time history
 unset HISTFILESIZE	     # no maximum size of history file
-HISTFILE=$HOME/.hist/`uname -n`/$$
+HISTFILE=$HOME/.hist/`uname -n`/`date +%Y%m%d-%H%M`-$$
 [ -d $(dirname ${HISTFILE}) ] || mkdir -p $(dirname ${HISTFILE})
 rm -f $HISTFILE   # Nuke old history for this PID.
 touch $HISTFILE

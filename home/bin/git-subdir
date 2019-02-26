@@ -39,6 +39,10 @@ fetch for all of the sub-repositories.
 This script adds a new git sub-command I<subdir> that allows git to operate
 on a repository struture like the one described above.
 
+When displaying results, repository names that have a prefix '+ ' are git
+worktrees, not full repositories.  These are displayed below the full
+repository for which they are a worktree.
+
 =head1 OPTIONS
 
 =over 2
@@ -107,70 +111,124 @@ use Boolean;
 use Cwd;
 use Getopt::Long;
 use Carp::Assert;
+use File::Spec;
 
 #========================================================================#
 
 my $SHA_LENGTH = 10;
+my ($PASS_STRING, $FAIL_STRING) = (undef, undef);
 
 #========================================================================#
 
-my $use_colour = True;
-my $update => False;
-my $branches => False;
-my $status => False;
-GetOptions ("colour!" => \$use_colour,
-            "update" => \$update,
-            "branches" => \$branches,
-            "status" => \$status);
+exit main ();
 
-($update or $branches or $status) or usage ();
+#========================================================================#
 
-# Actually, we always display the branches, so...
-$branches = True;
+=pod
 
-my ($PASS_STRING, $FAIL_STRING);
-if ($use_colour)
-{
-  $PASS_STRING = "\033[0;32mPass\033[0m";
-  $FAIL_STRING = "\033[0;31mFail\033[0m";
+=head1 METHODS
+
+The following methods are defined in this script.
+
+=over 2
+
+=cut
+
+#========================================================================#
+
+=pod
+
+=item B<main>
+
+Currently undocumented.
+
+=cut
+
+sub main {
+  my $use_colour = True;
+  my $update => False;
+  my $branches => False;
+  my $status => False;
+  GetOptions ("colour!" => \$use_colour,
+              "update" => \$update,
+              "branches" => \$branches,
+              "status" => \$status);
+
+  ($update or $branches or $status) or usage ();
+
+  # Actually, we always display the branches, so...
+  $branches = True;
+
+  if ($use_colour)
+  {
+    $PASS_STRING = "\033[0;32mPass\033[0m";
+    $FAIL_STRING = "\033[0;31mFail\033[0m";
+  }
+  else
+  {
+    $PASS_STRING = "Pass";
+    $FAIL_STRING = "Fail";
+  }
+
+  $| = True;                    # Autoflush
+
+  print "Finding repositories.....";
+  my @repo = find_repositories ();
+  my $repo_len = max (map { longest_repo_name ($_) } @repo);
+  my $br_len = max (map { longest_branch_name ($_) } @repo);
+  print "".scalar (@repo)." found.\n";
+
+  @repo = sort {$a->{-name} cmp $b->{-name}} @repo;
+
+  $repo_len = max ( $repo_len, 4);
+  $br_len = max ($br_len, 6);
+
+  printf "| %-".$repo_len."s | %-".$br_len."s |", "Repo", "Branch";
+  printf " %-".$SHA_LENGTH."s |", "SHA" if ($branches);
+  print " Fetch | FF   |" if ($update);
+  print " Commits | Local Ch. | Untracked |" if ($status);
+  print "\n";
+
+  print "+-".("-"x$repo_len)."-+-".("-"x$br_len)."-+";
+  print "-".("-"x $SHA_LENGTH)."-+" if ($branches);
+  print "-".("-"x 5)."-+-".("-"x 4)."-+" if ($update);
+  print "-".("-"x 7)."-+-".("-"x 9)."-+-".("-"x 9)."-+" if ($status);
+  print "\n";
+
+  foreach my $r (@repo)
+  {
+    print_repo_line ($r, $repo_len, $br_len, $branches, $update, $status, "");
+    foreach my $wt (@{$r->{-worktrees}})
+    {
+      print_repo_line ($wt, $repo_len, $br_len, $branches, $update, $status, "+ ");
+    }
+  }
 }
-else
-{
-  $PASS_STRING = "Pass";
-  $FAIL_STRING = "Fail";
-}
 
-$| = True; # Autoflush
+#========================================================================#
 
-print "Finding repositories.....";
-my @repo = find_repositories ();
-my $repo_len = max (map { safe_length ($_->{-name}) } @repo);
-my $br_len = max (map { safe_length ($_->{-branch}) } @repo);
-print "".scalar (@repo)." found.\n";
+=pod
 
-@repo = sort {$a->{-name} cmp $b->{-name}} @repo;
+=item B<format_repo_line>
 
-$repo_len = max ( $repo_len, 4);
-$br_len = max ($br_len, 6);
+Currently undocumented.
 
-printf "| %".$repo_len."s | %".$br_len."s |", "Repo", "Branch";
-printf " %".$SHA_LENGTH."s |", "SHA" if ($branches);
-print " Fetch |   FF |" if ($update);
-print " Commits | Local Ch. | Untracked |" if ($status);
-print "\n";
+=cut
 
-print "+-".("-"x$repo_len)."-+-".("-"x$br_len)."-+";
-print "-".("-"x $SHA_LENGTH)."-+" if ($branches);
-print "-".("-"x 5)."-+-".("-"x 4)."-+" if ($update);
-print "-".("-"x 7)."-+-".("-"x 9)."-+-".("-"x 9)."-+" if ($status);
-print "\n";
+sub print_repo_line {
+  my $r = shift;
+  my $repo_len = shift;
+  my $br_len = shift;
+  my $branches = shift;
+  my $update = shift;
+  my $status = shift;
+  my $name_prefix = shift;
 
-foreach my $r (@repo)
-{
   my $br = $r->{-branch};
   $br = "????" unless (defined $br);
 
-  printf "| %".$repo_len."s | %".$br_len."s |", $r->{-name}, $br;
+  printf "| %-".$repo_len."s | %-".$br_len."s |",
+    ($name_prefix . $r->{-name}), $br;
 
   if ($branches)
   {
@@ -181,7 +239,9 @@ foreach my $r (@repo)
 
   if ($update)
   {
-    if ((defined $br) and (scalar (@{$r->{-remotes}}) > 0))
+    if ((defined $br)
+          and (exists $r->{-remotes})
+          and (scalar (@{$r->{-remotes}}) > 0))
     {
       if (git_fetch ($r->{-path}))
       {
@@ -201,8 +261,27 @@ foreach my $r (@repo)
         printf "  %s |  N/A |", $FAIL_STRING;
       }
     }
+    elsif (not (exists ($r->{-remotes})))
+    {
+      # If there's no '-remotes' entry, then this is worktree, not a full
+      # repository.  In this case we don't need to do the fetch (the full
+      # repository has already been processed) but we do want to try a
+      # fast-forward.
+      print "   N/A |";
+
+      if (git_fast_forward ($r->{-path}))
+      {
+        printf " %s |", $PASS_STRING;
+      }
+      else
+      {
+        printf " %s |", $FAIL_STRING;
+      }
+    }
     else
     {
+      # There is a '-remotes' entry, but the list is empty.  This is a full
+      # repository, but there's not remote.
       print "   N/A |  N/A |";
 
       if (scalar (@{$r->{-remotes}}) == 0)
@@ -240,20 +319,114 @@ foreach my $r (@repo)
     }
   }
 
-  printf "\n";
+  print "\n";
 }
 
 #========================================================================#
 
 =pod
 
-=head1 METHODS
+=item B<longest_branch_name>
 
-The following methods are defined in this script.
-
-=over 2
+Takes a hash reference that is a repository, and returns the length of the
+longest name.  This involves considerinng both the top-level repository,
+and also any worktrees for that repository.
 
 =cut
+
+sub longest_branch_name {
+  my $repo = shift;
+
+  my $max_len = safe_length ($repo->{-branch});
+  foreach my $wt (@{$repo->{-worktrees}})
+  {
+    $max_len = max ($max_len, (safe_length ($wt->{-branch})));
+  }
+
+  return $max_len;
+}
+
+#========================================================================#
+
+=pod
+
+=item B<longest_repo_name>
+
+Takes a hash reference that is a repository, and returns the length of the
+longest name.  This involves considerinng both the top-level repository,
+and also any worktrees for that repository.
+
+When considering the names of any worktrees we add two to the length as
+when printed in the table we add a 2 character prefix to indicate that it
+is a worktree.
+
+=cut
+
+sub longest_repo_name {
+  my $repo = shift;
+
+  my $max_len = safe_length ($repo->{-name});
+  foreach my $wt (@{$repo->{-worktrees}})
+  {
+    $max_len = max ($max_len, (safe_length ($wt->{-name}) + 2));
+  }
+
+  return $max_len;
+}
+
+#========================================================================#
+
+=pod
+
+=item B<get_worktrees>
+
+Currently undocumented.
+
+=cut
+
+sub get_worktrees {
+  my $repo = shift;
+  my $orig_dir = shift;
+
+  my $wt_dir = $repo."/.git/worktrees";
+  (-d $wt_dir) or return ();
+
+  my @candidates = ();
+
+  opendir (my $dh, $wt_dir) or
+    die "Failed to open '$wt_dir' for reading: $!";
+  while (readdir $dh)
+  {
+    next if (m/^\./);
+    my $gitdir_file = $wt_dir."/$_/gitdir";
+    push @candidates, $gitdir_file if (-r "$gitdir_file");
+  }
+  closedir $dh or
+    die "Failed to close '$wt_dir' after reading: $!";
+
+  my @worktrees = ();
+  foreach my $c (@candidates)
+  {
+    my $path = `cat $c`;
+    chomp $path;
+    $path =~ s#/.git$##;
+
+    if (-d $path)
+    {
+      my $br = git_current_branch ("$path");
+      my $sha = git_current_sha ("$path", $SHA_LENGTH);
+      my $name = File::Spec->abs2rel ($path, $orig_dir);
+
+      my $worktree = { -name => $name,
+                       -path => $path,
+                       -branch => $br,
+                       -sha => $sha };
+      push @worktrees, $worktree;
+    }
+  }
+
+  return @worktrees;
+}
 
 #========================================================================#
 
@@ -573,11 +746,13 @@ sub find_repositories {
       my $br = git_current_branch ("$cwd/$name");
       my $sha = git_current_sha ("$cwd/$name", $SHA_LENGTH);
       my @remotes = git_remote_names ("$cwd/$name");
+      my @worktrees = get_worktrees ("$cwd/$name", "$cwd");
       push @repo_list, { -name => $name,
                          -path => "$cwd/$name",
                          -branch => $br,
                          -sha => $sha,
-                         -remotes => \@remotes };
+                         -remotes => \@remotes,
+                         -worktrees => \@worktrees };
     }
   }
 

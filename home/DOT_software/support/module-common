@@ -59,6 +59,10 @@ proc basic_package_setup { } {
         prepend-path PERL5LIB $pkg_dir/lib/perl5
     }
 
+    if { [ file isdirectory $pkg_dir/lib64 ] } {
+        prepend-path LD_LIBRARY_PATH $pkg_dir/lib64
+    }
+
     #
     # Package specific setup tasks.
     #

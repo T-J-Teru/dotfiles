@@ -18,7 +18,7 @@
         fall=fetch --all
         lr=remote -v
         count-conflicts = !bash -c 'git diff --name-only --diff-filter=U | xargs grep -c \"<<<<<<\"'
-        brr = "!f() { git bgrep $@ \\*;  }; f"
+        brr = "!f() { git bgrep $@ .\\*;  }; f"
         fstat = "!f() { git diff-tree --no-commit-id --stat=$(tput cols) -r ${1:-HEAD}; }; f"
 
 [color]

@@ -260,11 +260,16 @@ function addpath
     local NP=$1
 
     # Check it's an actual directory.
-    if [ ! -d "$NP" ]
+    if [ -z "$NP" -o ! -d "$NP" ]
     then
         if [ ${QUIET} == 0 ]
         then
-            echo "addpath: unknown path: $NP"
+            if [ -z "$NP" ]
+            then
+                echo "addpath: missing new path"
+            else
+                echo "addpath: unknown path: $NP"
+            fi
         fi
         return 1
     fi

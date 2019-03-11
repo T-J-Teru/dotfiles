@@ -178,6 +178,9 @@ sub main {
   my $br_len = max (map { longest_branch_name ($_) } @repo);
   print "".scalar (@repo)." found.\n";
 
+  # If there are no repositories, then we're done.
+  exit (0) if (scalar (@repo) == 0);
+
   @repo = sort {$a->{-name} cmp $b->{-name}} @repo;
 
   $repo_len = max ( $repo_len, 4);

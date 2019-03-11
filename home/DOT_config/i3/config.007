@@ -1,0 +1,21 @@
+# focus follows mouse <yes|no>
+focus_follows_mouse no
+
+# Volume control keys.
+set $sink `pacmd stat | grep "Default sink name: " | cut -d: -f2`
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume $sink +5% && pactl set-sink-mute $sink 0 && killall -SIGUSR1 i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume $sink -5% && pactl set-sink-mute $sink 0 && killall -SIGUSR1 i3status
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute $sink toggle && killall -SIGUSR1 i3status
+
+exec --no-startup-id xscreensaver
+exec --no-startup-id xmodmap ~/.xmodmap
+
+exec --no-startup-id xsetroot -solid "#333333"
+
+# exec --no-startup-id xrandr --output HDMI-0 --right-of DVI-0
+
+# This should make Caps-Lock into another left Ctrl key.
+exec --no-startup-id setxkbmap -option caps:ctrl_modifier
+
+# Background image.
+exec --no-startup-id feh --bg-scale --no-xinerama ~/Pictures/Wallpapers/worldsedgewinter12x3840.jpg

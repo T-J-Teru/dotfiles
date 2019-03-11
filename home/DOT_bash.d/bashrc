@@ -820,6 +820,14 @@ export PYTHONUSERBASE=$HOME/.python
 
 #=====================================================================
 
+if [ -f ~/.bash.d/apb-projects ]
+then
+    APB_PROJECT_DIR=$HOME/projects
+    source ~/.bash.d/apb-projects
+fi
+
+#=====================================================================
+
 # Local Variables:
 # mode: sh
 # End:

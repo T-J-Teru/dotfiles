@@ -111,6 +111,15 @@ export BINUTILSVER=2.22
 export GRAPHVIZVER=2.30.1
 export FP_GUILE_VERSION=1.8.5
 
+#======================================#
+#    Protect agsint Ctrl-D mishaps     #
+#======================================#
+
+# With this set in bash I need to hit Ctrl-D 3 times in order to
+# actually quit a shell with Ctrl-D.  The first two times will give a
+# warning.
+export IGNOREEOF=2
+
 #====================================#
 #    For warnings during startup     #
 #====================================#
@@ -749,7 +758,6 @@ touch $HISTFILE
 LAST_CWD=$PWD
 HISTCONTROL=ignoredups     # don't save history identical to previous lines
 shopt -u histappend        # overwrite HISTFILE on exit instead of appending
-unset IGNOREEOF	     # ctrl-d will kill the shell
 unset TMOUT		     # no timed auto-logout
 unset MAILCHECK
 command_oriented_history=1 # save multi-line commands as a single line

@@ -33,46 +33,7 @@ use Carp::Assert;
 
 #========================================================================#
 
-my $opts = parse_command_line_options ();
-
-my $match_spec = build_match_spec ($opts);
-
-my @branches = load_branches (true);
-
-my @matching = find_matching_branches ($match_spec, @branches);
-
-my $datetype="committerdate"; ## Alternatively 'authordate'.
-
-my $ref_list = build_ref_list (@matching);
-
-# No matches found.
-exit 1 if ($ref_list eq "");
-
-# Find the longest refname that git will display.
-my $longest_ref_len
-  = `git for-each-ref --format='%(refname:short)' ${ref_list} | wc -L`;
-chomp $longest_ref_len;
-
-# Create a shell command to display all of the references, sorted in the
-# correct order.
-my $cmd = ("git for-each-ref --shell ".
-             "--sort=\"-${datetype}:iso8601\" ".
-             "--format=\"printf \\\"%%s %%${longest_ref_len}s\\t%%s\\n\\\" %(HEAD) %(refname:short) %(${datetype}:relative);\"".
-             "${ref_list}");
-
-if ($opts->{lines} > 0)
-{
-  $cmd = "$cmd | head -n".$opts->{lines};
-}
-
-$cmd = `$cmd`;
-
-# Finally, run the shell command to display the list.  This should never
-# return.
-exec $cmd;
-
-# Should never get here.
-exit 1;
+exit main ();
 
 #========================================================================#
 
@@ -85,6 +46,56 @@ The following methods are defined in this script.
 =over 4
 
 =cut
+
+#========================================================================#
+
+=pod
+
+=item B<main>
+
+The main program.
+
+=cut
+
+sub main {
+  my $opts = parse_command_line_options ();
+
+  my $match_spec = build_match_spec ($opts);
+
+  my @branches = load_branches (true);
+
+  my @matching = find_matching_branches ($match_spec, @branches);
+
+  my $datetype="committerdate"; ## Alternatively 'authordate'.
+
+  my $ref_list = build_ref_list (@matching);
+
+  # No matches found.
+  return 1 if ($ref_list eq "");
+
+  # Find the longest refname that git will display.
+  my $longest_ref_len
+    = `git for-each-ref --format='%(refname:short)' ${ref_list} | wc -L`;
+  chomp $longest_ref_len;
+
+  # Create a shell command to display all of the references, sorted in the
+  # correct order.
+  my $cmd = ("git for-each-ref --shell ".
+               "--sort=\"-${datetype}:iso8601\" ".
+               "--format=\"printf \\\"%%s %%${longest_ref_len}s\\t%%s\\n\\\" %(HEAD) %(refname:short) %(${datetype}:relative);\"".
+               "${ref_list}");
+
+  if ($opts->{lines} > 0)
+  {
+    $cmd = "$cmd | head -n".$opts->{lines};
+  }
+
+  $cmd = `$cmd`;
+
+  # Finally, run the shell command to display the list.  This should never
+  # return.
+  exec $cmd || return 1;
+}
 
 #========================================================================#
 
@@ -125,6 +136,8 @@ defined.
 =cut
 
 sub build_ref_list {
+  my @matching = @_;
+
   my $ref_list="";
 
   foreach (@matching)

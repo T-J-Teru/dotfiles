@@ -33,7 +33,9 @@ use Carp::Assert;
 
 #========================================================================#
 
-my $match_spec = build_match_spec ();
+my $opts = parse_command_line_options ();
+
+my $match_spec = build_match_spec ($opts);
 
 my @branches = load_branches (true);
 
@@ -57,6 +59,12 @@ my $cmd = ("git for-each-ref --shell ".
              "--sort=\"-${datetype}:iso8601\" ".
              "--format=\"printf \\\"%%s %%${longest_ref_len}s\\t%%s\\n\\\" %(HEAD) %(refname:short) %(${datetype}:relative);\"".
              "${ref_list}");
+
+if ($opts->{lines} > 0)
+{
+  $cmd = "$cmd | head -n".$opts->{lines};
+}
+
 $cmd = `$cmd`;
 
 # Finally, run the shell command to display the list.  This should never
@@ -77,6 +85,31 @@ The following methods are defined in this script.
 =over 4
 
 =cut
+
+#========================================================================#
+
+=pod
+
+=item B<parse_command_line_options>
+
+Parse command line options, return a reference to a hash containing the
+options.
+
+=cut
+
+sub parse_command_line_options {
+  my %opt = ();
+
+  my $all = false;
+  my $lines = -1;
+  GetOptions ("all|a" => \$all,
+              "lines|n=i" => \$lines);
+
+  $opt{all} = $all;
+  $opt{lines} = $lines;
+
+  return \%opt;
+}
 
 #========================================================================#
 
@@ -217,8 +250,9 @@ to find command line flags and branch and/or remote patterns.
 =cut
 
 sub build_match_spec {
-  my $all = false;
-  GetOptions ("all|a" => \$all);
+  my $opts = shift;
+
+  my $all = $opts->{all};
 
   my ($remote, $branch);
   if (scalar (@ARGV) == 1)

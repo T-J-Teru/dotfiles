@@ -23,6 +23,10 @@ proc basic_package_setup { } {
         prepend-path PATH $pkg_dir/bin
     }
 
+    if { [ file isdirectory $pkg_dir/usr/bin ] } {
+        prepend-path PATH $pkg_dir/usr/bin
+    }
+
     if { [ file isdirectory $pkg_dir/man ] } {
         prepend-path MANPATH $pkg_dir/man
     }
@@ -55,6 +59,10 @@ proc basic_package_setup { } {
         prepend-path PYTHONPATH $pkg_dir/lib/python2.7/site-packages
     }
 
+    if { [ file isdirectory $pkg_dir/usr/lib/python2.7/site-packages ] } {
+        prepend-path PYTHONPATH $pkg_dir/usr/lib/python2.7/site-packages
+    }
+
     if { [ file isdirectory $pkg_dir/lib/perl5 ] } {
         prepend-path PERL5LIB $pkg_dir/lib/perl5
     }
@@ -71,6 +79,10 @@ proc basic_package_setup { } {
        foreach dir [glob -type d $pkg_dir/share/aclocal-*] {
            prepend-path ACLOCAL_PATH $dir
        }
+       foreach dir [glob -type d /usr/share/aclocal-*] {
+           prepend-path ACLOCAL_PATH $dir
+       }
+       prepend-path ACLOCAL_PATH /usr/share/aclocal
     }
 }
 

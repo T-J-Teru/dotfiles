@@ -736,6 +736,7 @@ sub find_repositories {
     die "Failed to open '$cwd' for reading: $!";
   while (readdir $dh)
   {
+    next if (/^\./);
     push @candidate_list, $_ if (-d "$cwd/$_");
   }
   closedir $dh or

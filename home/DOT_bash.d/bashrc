@@ -706,9 +706,9 @@ function escape ()
 
     builtin cd /
 
-    while [ ! -d $ORIG ]
+    while [ ! -d "$ORIG" ]
     do
-        ORIG=`dirname $ORIG`
+        ORIG=`dirname "$ORIG"`
     done
 
     if [ "x$ORIG" == "x$ORIG_TO_PRINT" ]
@@ -719,7 +719,7 @@ function escape ()
         echo -e "Now in: `colourize_path \"$ORIG\"`"
     fi
 
-    builtin cd $ORIG
+    builtin cd "$ORIG"
 }
 
 #=========================================#

@@ -6,7 +6,7 @@ function do_colour () {
 }
 
 case "$1" in
-    *.c|*.sh|*.cc|*.cpp|*.h|*.H|*.pl|*.py|*.R|*.patch)
+    *.c|*.sh|*.cc|*.cpp|*.h|*.H|*.pl|*.py|*.R|*.patch|*.f90|*.f)
         do_colour "$1"
         ;;
     ?*.*)

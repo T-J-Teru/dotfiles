@@ -1,0 +1,6 @@
+#! /bin/bash
+
+cpu_count=`cat /proc/cpuinfo 2>/dev/null | grep -c ^processor`
+parallel_count=$(echo $cpu_count | awk '{printf "%d\n", $1 + 1}')
+
+exec make -O -j ${parallel_count} -l ${parallel_count} "$@"

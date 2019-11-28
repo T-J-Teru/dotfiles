@@ -835,6 +835,17 @@ then
 fi
 
 #=====================================================================
+# For help on adding command completion to custom git commands see:
+#
+# https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
+# https://stackoverflow.com/questions/41307313/custom-git-command-autocompletion
+
+function _git_update_changelogs () {
+    # Just offer the same choices as 'git rebase' does.
+    _git_rebase "$@"
+}
+
+#=====================================================================
 
 # Local Variables:
 # mode: sh

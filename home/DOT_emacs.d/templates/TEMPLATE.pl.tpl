@@ -52,8 +52,4 @@ The following methods are defined in this script.
 
 =back
 
-=head1 AUTHOR
-
-(>>>USER_NAME<<<), (>>>DATE<<<)
-
 =cut

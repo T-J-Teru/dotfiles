@@ -184,7 +184,7 @@ function prompt_command
       case $TERM in
           eterm*)
           ;;
-          xterm*)
+          xterm*|screen)
               echo "-ne" "\033]0;`whoami`@${SHORT_HOSTNAME} ($PWD)\007"
               ;;
           *)
@@ -202,7 +202,7 @@ PROMPT_COMMAND=prompt_command
 function xtitle
 {
   case $TERM in
-      xterm*)
+      xterm*|screen)
           if [ "$1" == "" ]
           then
 	      WINDOW_TITLE=""

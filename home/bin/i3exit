@@ -1,0 +1,39 @@
+#!/bin/sh
+
+lock() {
+    i3lock
+}
+
+function confirm() {
+    zenity --question \
+           --text="Really $1?" \
+           --cancel-label="No" \
+           --ok-label="Yes"
+    return $?
+}
+
+case "$1" in
+    lock)
+        lock
+        ;;
+    logout)
+        confirm logout && i3-msg exit
+        ;;
+    suspend)
+        confirm suspend && lock && systemctl suspend
+        ;;
+    hibernate)
+        confirm hibernate && lock && systemctl hibernate
+        ;;
+    reboot)
+        confirm reboot && systemctl reboot
+        ;;
+    shutdown)
+        confirm shutdown && systemctl poweroff
+        ;;
+    *)
+        echo "Usage: $0 {lock|logout|suspend|hibernate|reboot|shutdown}"
+        exit 2
+esac
+
+exit 0

@@ -45,14 +45,29 @@
 ;;;;                    Package System
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Setup the emacs package system.
-(setq package-archives
-      '(("org" . "http://orgmode.org/elpa/")
-        ("gnu" . "http://elpa.gnu.org/packages/")
-        ("marmalade" . "http://marmalade-repo.org/packages/")
-        ("melpa" . "http://melpa.org/packages/")))
-(setq package-enable-at-startup nil)
+;; Initialise installed packages.
 (package-initialize)
+
+(require 'package)
+
+;; Setup the emacs package system.
+(setq-default package-archives
+              '(("org" . "http://orgmode.org/elpa/")
+                ("gnu" . "http://elpa.gnu.org/packages/")
+                ("marmalade" . "http://marmalade-repo.org/packages/")
+                ("melpa" . "http://melpa.org/packages/")
+                ("melpa-stable" . "https://stable.melpa.org/packages/"))
+              package-archive-priorities
+              '(("gnu"          . 1)
+                ("marmalade"    . 3)
+                ("melpa"        . 2)
+                ("melpa-stable" . 2)
+                ("org"          . 2)))
+
+;; If `use-package' is not already installed, install it.
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                        Printing
@@ -78,28 +93,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configure the emacs load-path, adding directories and loading new
 ;; features as required.
-(defconst elisp-directory (expand-file-name "~/.emacs.d"))
+(defconst elisp-directory (expand-file-name "~/.emacs.d/"))
 (defmacro add-to-load-path (directory &rest body)
   "If DIRECTORY exists then it is added to the `load-path', and
 then BODY is evaluated.  If directory does not exist then the
 `load-path' is not changed, and BODY is not evaluated."
   `(when (file-exists-p
-          (concat elisp-directory "/" ,directory))
-     (add-to-list 'load-path (concat elisp-directory "/" ,directory))
+          (concat elisp-directory ,directory))
+     (add-to-list 'load-path (concat elisp-directory ,directory))
      ,@body))
 
 (add-to-load-path "cedet")
 (add-to-load-path "packages")
-(add-to-load-path "my-elisp")
+(add-to-load-path "my-elisp" (require 'andrew-autoloads))
 (add-to-load-path "org-mode/lisp")
 (add-to-load-path "cc-mode")
 (add-to-load-path "notmuch")
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;                        My Autoloads
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(require 'andrew-autoloads)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                        Mode Line
@@ -122,11 +131,17 @@ then BODY is evaluated.  If directory does not exist then the
 
 ;; Use `icomplete-mode' and the additional `icomplete+' package for
 ;; minibuffer completion.
-(require 'icomplete+ nil t)
-(icomplete-mode)
+(use-package icomplete
+  :ensure t
+  :config
+  (require 'icomplete+)
+  (icomplete-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                    After Save Hook
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Arrange to make scripts executable when they are first saved.
-(autoload 'andrew/make-executable-after-save "andrew-after-save")
 (add-hook 'after-save-hook 'andrew/make-executable-after-save)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -283,11 +298,10 @@ removing\nany \\r characters."
         linum+-dynamic-format "%%%dd"))
 
 ;; Allow the line number of the curent line to be highlighted.
-;;
-;; TODO: This should be lazily loaded as part of activating line
-;; number mode.
-(when (require 'hlinum nil t)
-  (hlinum-activate))
+(use-package hlinum
+  :ensure t
+  :config
+  (add-hook 'linum-mode-hook 'hlinum-activate))
 
 ;; KEYBINDING: Turns line number mode on/off.
 (global-set-key (kbd "C-c n") 'linum-mode)
@@ -425,8 +439,10 @@ using `abort-recursive-edit'."
 ;;;;                    Line Highlighting
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; KEYBINDING: Allow line highlighting to be toggled on/off.
-(global-set-key (kbd "C-c h") 'hl-line-mode)
+(use-package hl-line
+  :ensure t
+  :bind
+  ("C-c h" . hl-line-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Highlighting Whitespace
@@ -458,26 +474,43 @@ using `abort-recursive-edit'."
 ;;;;                     Configure Grep
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(eval-after-load "grep"
-  (lambda ()
-    ;; Tweak the grep configuration to ignore backup files.
-    (grep-apply-setting
-     'grep-command
-     "grep --exclude='*~' --exclude='.#*' -IHn -e ")
-    ;; Turn on highlight line in the results buffer.
-    (add-hook 'grep-mode-hook (lambda () (hl-line-mode 1)))))
+(use-package grep
+  :config
+  ;; Tweak the grep configuration to ignore backup files.
+  (grep-apply-setting
+   'grep-command
+   "grep --exclude='*~' --exclude='.#*' -IHn -e ")
+  ;; Turn on highlight line in the results buffer.
+  (add-hook 'grep-mode-hook (lambda () (hl-line-mode 1))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                     Which-Key Mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; There is a bad interaction between this package and avy.  I bind
+;; avy to use 'C-c /', at which point avy should prompt for a
+;; character, but sometimes, which-key causes 'C-c /-' to be
+;; displayed, as though 'C-c /' was a prefix.
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :config
+  (which-key-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Configure avy Package
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; TODO: The face configuration part of this would be better done in a
-;; theme.
-(with-eval-after-load 'avy
+(use-package avy
+  :ensure t
+  :config
   (setq avy-background 't)
   (set-face-attribute 'avy-lead-face nil
-  :foreground "red"
-  :background 'unspecified))
+                      :foreground "red"
+                      :background "unspecified")
+  :bind
+  (("C-c /" . avy-goto-word-1)
+   ("C-c ." . avy-goto-char)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Other Window Backwards
@@ -498,7 +531,7 @@ using `abort-recursive-edit'."
 
 (when (require 'auto-complete-config nil t)
   (add-to-list 'ac-dictionary-directories
-               (concat elisp-directory "/auto-complete/dict/"))
+               (concat elisp-directory "auto-complete/dict/"))
   (ac-config-default))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -514,6 +547,26 @@ using `abort-recursive-edit'."
 (set-default `indent-tabs-mode nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                        Ace Window
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; TODO: There is a slight bug with this package and the fci-mode
+;; package, sometimes the number appears to the right of the width
+;; marker.  Would be nice if I could find a fix or work-around for tis
+;; bug.
+(use-package ace-window
+  :ensure t
+  :bind (("C-c w" . 'ace-window)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                          IEdit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package iedit
+  :ensure t
+  :bind (("C-c ;" . 'iedit-mode-toggle-on-function)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                      Global Keybindings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -527,20 +580,6 @@ using `abort-recursive-edit'."
 ;; KEYBINDING: Toggle menubar and toolbar
 (global-set-key (kbd "<f12>") 'toggle-menubar-and-toolbar)
 
-;; KEYBINDING: Jump to work or sub-word based on first letter
-(global-set-key (kbd "C-c /") 'avy-goto-word-or-subword-1)
-
-;; KEYBINDING: Quickly jump to a specific character in buffer.
-(global-set-key (kbd "C-c .") 'avy-goto-char)
-
-;; KEYBINDING: Just to specific window using shortcut key.
-;;
-;; TODO: There is a slight bug with this package and the fci-mode
-;; package, sometimes the number appears to the right of the width
-;; marker.  Would be nice if I could find a fix or work-around for tis
-;; bug.
-(global-set-key (kbd "C-c w") 'ace-window)
-
 ;; KEYBINDING: Jump to beginning / end of buffer.
 ;;
 ;; In some terminals 'C-<home>' and 'C-<end>' do not work.  These
@@ -548,16 +587,18 @@ using `abort-recursive-edit'."
 (global-set-key (kbd "C-x <home>") 'beginning-of-buffer)
 (global-set-key (kbd "C-x <end>") 'end-of-buffer)
 
-;; KEYBINDING: Use iedit mode to make changes within the current
-;; function.
-(global-set-key (kbd "C-c ;") 'iedit-mode-toggle-on-function)
-
 ;; KEYBINDING: Easier access to `goto-line'.
 (global-set-key [?\M-g] 'goto-line)
 
-;; KEYBINDING: Activate multiple cursors mode.
-(global-set-key (kbd "C-c e") 'mc/edit-lines)
-(global-set-key (kbd "C-c ?") 'ace-mc-add-char)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                      Multile Cursors
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package multiple-cursors
+  :ensure t
+  :bind
+  (("C-c e" . 'mc/edit-lines)
+   ("C-c ?" . 'ace-mc-add-char)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                     Header Line
@@ -570,17 +611,20 @@ using `abort-recursive-edit'."
                     :box '(:line-width 1 :color "red"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;                    Miscellaneous Configuration
+;;;;                        Undo Tree
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Delete should delete the current select,
-(delete-selection-mode t)
+;; Use `undo-tree' globally.  This draws the pretty undo tree diagrams
+;; to allow easier navigation of the undo history.
+(use-package undo-tree
+  :ensure t
+  :diminish
+  :config
+  (global-undo-tree-mode 1))
 
-;; Highlight the current selection.
-(transient-mark-mode t)
-
-;; Show possible keybindings
-(which-key-mode 1)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                 Setup `auto-mode-alist'
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Setup the auto-mode-alist
 ;;
@@ -600,29 +644,49 @@ using `abort-recursive-edit'."
  (append auto-mode-alist interpreter-mode-alist))
 ;; Start in the right mode when editing mutt files.
 (add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
+(add-to-list 'auto-mode-alist '("\\.R\\'" . andrew-r-mode))
+(add-to-list 'auto-mode-alist '("\\.Rd\\'" . andrew-r-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                    Fill Column Indicator
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Configure FCI mode, this places the 80 column marker down the right
 ;; hand endge of the screen.
-(when (fboundp 'fci-mode)
-  ;; KEYBINDING: Toggle `fci-mode' on / off.
+(use-package fill-column-indicator
+  :ensure t
+  :config
   (global-set-key (kbd "C-c |") 'fci-mode)
   (add-hook 'c-mode-common-hook 'fci-mode)
   (add-hook 'cperl-mode-hook 'fci-mode)
   (add-hook 'emacs-lisp-mode-hook 'fci-mode))
 
-;; Turn on `undo-tree' whenever we have it available.  This draws the
-;; pretty undo tree diagrams to allow easier navigation of the undo
-;; history.
-(when (fboundp 'global-undo-tree-mode)
-  (global-undo-tree-mode 1))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                          XClip
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Turn on `xclip-mode', this allows copy and paste to the x-clipboard
 ;; when running in the terminal, using the xclip program.
-(when (fboundp 'xclip-mode)
-  (xclip-mode 1))
+(use-package xclip
+  :ensure t
+  :config
+  (xclip-mode t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                    Miscellaneous Configuration
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Delete should delete the current select,
+(delete-selection-mode t)
+
+;; Highlight the current selection.
+(transient-mark-mode t)
 
 ;; Activate `winner-mode' to allow for window undo and redo.
-(winner-mode 1)
+(use-package winner
+  :ensure t
+  :config
+  (winner-mode t))
 
 ;; Enable `cua-mode' but without the C-x/C-z/C-v bindings being
 ;; enabled.  This is basically an alternative to rectangle selection
@@ -646,7 +710,8 @@ using `abort-recursive-edit'."
 ;; TODO: See if I can make more use of this.  Is there a better
 ;; alternative?  I'd like a version where hidden blocks are
 ;; automatically expanded upon entry.
-(require 'hideshow)
+(use-package hideshow
+  :ensure t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Semantic
@@ -664,8 +729,9 @@ using `abort-recursive-edit'."
 ;;;;                   Setup `browse-kill-ring'
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; KEYBINDING: Browse the `kill-ring'.
-(global-set-key "\C-cy" 'browse-kill-ring)
+(use-package browse-kill-ring
+  :ensure t
+  :bind (("C-c y" . 'browse-kill-ring)))
 
 ;; Settings for `browse-kill-ring-mode'.
 (add-hook
@@ -697,27 +763,10 @@ using `abort-recursive-edit'."
      "Face used for the separator in browse-kill-ring buffer")
    (setq browse-kill-ring-separator-face 'browse-kill-ring-separator)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;                      Setup `R-mode'
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Loading the `ess-site' file, which is needed for `R-mode' is too
-;; expensive to do at every startup, especially how infrequently I
-;; actually edit R code.
-;;
-;; This hack gives me R mode support for *.R and *.Rd files at minimal
-;; cost.
-;;
-;; TODO: Extend the list of file extensions for which I load and
-;; activate `R-mode' to cover more of the auxiliary R file extensions.
-
-(defun andrew-r-mode ()
-  (interactive)
-  (require 'ess-site)
-  (R-mode))
-
-(add-to-list 'auto-mode-alist '("\\.R\\'" . andrew-r-mode))
-(add-to-list 'auto-mode-alist '("\\.Rd\\'" . andrew-r-mode))
+;; Allow killing of read-only text, and don't clutter the kill-ring
+;; with duplicates.
+(setq-default kill-read-only-ok t
+              kill-do-not-save-duplicates t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                Setup `notmuch' email client
@@ -770,5 +819,5 @@ using `abort-recursive-edit'."
 
 ;; Store custom settings into a separate file.  Load that file now to
 ;; pick up previously stored settings.
-(setq custom-file "~/.emacs.d/custom.el")
+(setq custom-file (concat elisp-directory "custom.el"))
 (load custom-file)

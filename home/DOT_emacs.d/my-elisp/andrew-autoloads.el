@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads nil "andrew-after-save" "andrew-after-save.el"
-;;;;;;  (22320 20658 745594 42000))
+;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from andrew-after-save.el
 
 (autoload 'andrew/make-executable-after-save "andrew-after-save" "\
@@ -15,8 +15,8 @@ looks like a script.
 
 ;;;***
 
-;;;### (autoloads nil "andrew-cc-mode" "andrew-cc-mode.el" (21486
-;;;;;;  28112 437976 422000))
+;;;### (autoloads nil "andrew-cc-mode" "andrew-cc-mode.el" (0 0 0
+;;;;;;  0))
 ;;; Generated autoloads from andrew-cc-mode.el
 
 (autoload 'andrew-cc-mode "andrew-cc-mode" "\
@@ -24,10 +24,12 @@ looks like a script.
 
 \(fn)" nil nil)
 
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "andrew-cc-mode" '("andrew" "font-lock-format-specifier-face")))
+
 ;;;***
 
 ;;;### (autoloads nil "andrew-cperl-mode" "andrew-cperl-mode.el"
-;;;;;;  (21486 28112 438976 387000))
+;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from andrew-cperl-mode.el
 
 (autoload 'andrew-cperl-mode "andrew-cperl-mode" "\
@@ -35,10 +37,12 @@ looks like a script.
 
 \(fn)" nil nil)
 
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "andrew-cperl-mode" '("andrew-cperl")))
+
 ;;;***
 
-;;;### (autoloads nil "andrew-diff-mode" "andrew-diff-mode.el" (22329
-;;;;;;  33443 535227 637000))
+;;;### (autoloads nil "andrew-diff-mode" "andrew-diff-mode.el" (0
+;;;;;;  0 0 0))
 ;;; Generated autoloads from andrew-diff-mode.el
 
 (autoload 'andrew-diff-mode "andrew-diff-mode" "\
@@ -48,8 +52,27 @@ looks like a script.
 
 ;;;***
 
+;;;### (autoloads nil "andrew-email-mode" "andrew-email-mode.el"
+;;;;;;  (0 0 0 0))
+;;; Generated autoloads from andrew-email-mode.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "andrew-email-mode" '("andrew-email-mode")))
+
+;;;***
+
+;;;### (autoloads nil "andrew-format-comment" "andrew-format-comment.el"
+;;;;;;  (0 0 0 0))
+;;; Generated autoloads from andrew-format-comment.el
+
+(autoload 'andrew/reformat-comment "andrew-format-comment" "\
+Reformt a comment line /****  TEXT ****/
+
+\(fn)" t nil)
+
+;;;***
+
 ;;;### (autoloads nil "andrew-forth-mode" "andrew-forth-mode.el"
-;;;;;;  (22329 33262 247639 31000))
+;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from andrew-forth-mode.el
 
 (autoload 'andrew-forth-mode "andrew-forth-mode" "\
@@ -60,7 +83,7 @@ looks like a script.
 ;;;***
 
 ;;;### (autoloads nil "andrew-javascript-mode" "andrew-javascript-mode.el"
-;;;;;;  (22329 33376 840954 232000))
+;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from andrew-javascript-mode.el
 
 (autoload 'andrew-javascript-mode "andrew-javascript-mode" "\
@@ -71,7 +94,7 @@ looks like a script.
 ;;;***
 
 ;;;### (autoloads nil "andrew-latex-mode" "andrew-latex-mode.el"
-;;;;;;  (22329 32779 443234 952000))
+;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from andrew-latex-mode.el
 
 (autoload 'andrew-latex-mode "andrew-latex-mode" "\
@@ -81,8 +104,63 @@ looks like a script.
 
 ;;;***
 
-;;;### (autoloads nil "menu-toggle" "menu-toggle.el" (21486 28112
-;;;;;;  437976 422000))
+;;;### (autoloads nil "andrew-notmuch" "andrew-notmuch.el" (0 0 0
+;;;;;;  0))
+;;; Generated autoloads from andrew-notmuch.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "andrew-notmuch" '("andrew/notmuch-")))
+
+;;;***
+
+;;;### (autoloads nil "andrew-org" "andrew-org.el" (0 0 0 0))
+;;; Generated autoloads from andrew-org.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "andrew-org" '("org-" "andrew-org-space")))
+
+;;;***
+
+;;;### (autoloads nil "andrew-org-capture" "andrew-org-capture.el"
+;;;;;;  (0 0 0 0))
+;;; Generated autoloads from andrew-org-capture.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "andrew-org-capture" '("org-")))
+
+;;;***
+
+;;;### (autoloads nil "andrew-org-setup" "andrew-org-setup.el" (0
+;;;;;;  0 0 0))
+;;; Generated autoloads from andrew-org-setup.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "andrew-org-setup" '("andrew-org/")))
+
+;;;***
+
+;;;### (autoloads nil "andrew-r-mode" "andrew-r-mode.el" (0 0 0 0))
+;;; Generated autoloads from andrew-r-mode.el
+
+(autoload 'andrew-r-mode "andrew-r-mode" "\
+
+
+\(fn)" t nil)
+
+;;;***
+
+;;;### (autoloads nil "andrew-work-log" "andrew-work-log.el" (0 0
+;;;;;;  0 0))
+;;; Generated autoloads from andrew-work-log.el
+
+(autoload 'andrew-work-log/visit-log-entry "andrew-work-log" "\
+Open up work log for DATE.
+If DATE is nil, or not specified, then open the work-log for the
+current date.
+
+\(fn &optional DATE)" t nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "andrew-work-log" '("andrew-work-log/")))
+
+;;;***
+
+;;;### (autoloads nil "menu-toggle" "menu-toggle.el" (0 0 0 0))
 ;;; Generated autoloads from menu-toggle.el
 
 (autoload 'toggle-menubar-and-toolbar "menu-toggle" "\
@@ -92,7 +170,7 @@ Switches off both menu and tool bar.
 
 ;;;***
 
-;;;### (autoloads nil "mparen" "mparen.el" (21486 28112 437976 422000))
+;;;### (autoloads nil "mparen" "mparen.el" (0 0 0 0))
 ;;; Generated autoloads from mparen.el
 
 (autoload 'jump-to-matching-paren "mparen" "\
@@ -102,10 +180,7 @@ Go to the matching parenthesis if on parenthesis otherwise insert a hash.
 
 ;;;***
 
-;;;### (autoloads nil nil ("andrew-email-mode.el" "andrew-ispell.el"
-;;;;;;  "andrew-notmuch.el" "andrew-org-capture.el" "andrew-org-setup.el"
-;;;;;;  "andrew-org-v2-setup.el" "andrew-org.el" "andrew-work-log.el"
-;;;;;;  "format-comment.el") (22329 40290 956157 906000))
+;;;### (autoloads nil nil ("andrew-ispell.el") (0 0 0 0))
 
 ;;;***
 

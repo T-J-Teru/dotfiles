@@ -18,6 +18,56 @@
      (:name "recent-unread" :query "tag:unread AND date:2h.. AND NOT tag:buildroot" :search-type tree)
      (:name "recent-inbox" :query "tag:unread AND tag:inbox AND date:24h.." :search-type tree)
      (:name "todo" :query "tag:todo" :search-type tree))))
+ '(package-selected-packages
+   (quote
+    (projectile org graphviz-dot-mode xclip which-key undo-tree paredit origami magit iedit git-gutter form-feed fill-column-indicator dictionary col-highlight browse-kill-ring auto-complete ace-window ace-mc)))
+ '(safe-local-variable-values
+   (quote
+    ((eval setq gdb-dir-locals-settings
+           (quote
+            ((tcl-mode
+              (tcl-indent-level . 4)
+              (tcl-continued-indent-level . 4)
+              (indent-tabs-mode . t))
+             (nil
+              (bug-reference-url-format . "http://sourceware.org/bugzilla/show_bug.cgi?id=%s"))
+             (c-mode
+              (c-file-style . "GNU")
+              (mode . c++)
+              (indent-tabs-mode . t)
+              (tab-width . 8)
+              (c-basic-offset . 2)
+              (eval c-set-offset
+                    (quote innamespace)
+                    0))
+             (c++-mode
+              (eval when
+                    (fboundp
+                     (quote c-toggle-comment-style))
+                    (c-toggle-comment-style 1))
+              (indent-tabs-mode . t)
+              (tab-width . 8)
+              (c-file-style . "GNU")
+              (c-basic-offset . 2)
+              (eval c-set-offset
+                    (quote innamespace)
+                    0)))))
+     (eval when
+           (fboundp
+            (quote c-toggle-comment-style))
+           (c-toggle-comment-style 1))
+     ((eval c-set-offset
+            (quote innamespace)
+            0)
+      (eval when
+            (fboundp
+             (quote c-toggle-comment-style))
+            (c-toggle-comment-style 1)))
+     (eval c-set-offset
+           (quote innamespace)
+           0)
+     (c-offsets-alist
+      (innamespace . 0)))))
  '(send-mail-function (quote smtpmail-send-it))
  '(template-use-package t nil (template)))
 (custom-set-faces

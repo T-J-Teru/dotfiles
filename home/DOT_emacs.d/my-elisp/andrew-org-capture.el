@@ -55,4 +55,52 @@
             (re-search-forward "%\\?" end t))
         (replace-match ""))))
 
+;; Fixed version of `org-capture-refile', this calls my new function
+;; `org-save-and-close-refile-target-buffer'.
+(defun org-capture-refile ()
+  "Finalize the current capture and then refile the entry.
+Refiling is done from the base buffer, because the indirect buffer is then
+already gone.  Any prefix argument will be passed to the refile command."
+  (interactive)
+  (unless (eq (org-capture-get :type 'local) 'entry)
+    (user-error "Refiling from a capture buffer makes only sense \
+for `entry'-type templates"))
+  (let* ((base (or (buffer-base-buffer) (current-buffer)))
+	 (pos (make-marker))
+	 (org-capture-is-refiling t)
+	 (kill-buffer (org-capture-get :kill-buffer 'local))
+	 (jump-to-captured (org-capture-get :jump-to-captured 'local)))
+    ;; Since `org-capture-finalize' may alter buffer contents (e.g.,
+    ;; empty lines) around entry, use a marker to refer to the
+    ;; headline to be refiled.  Place the marker in the base buffer,
+    ;; as the current indirect one is going to be killed.
+    (set-marker pos (save-excursion (org-back-to-heading t) (point)) base)
+    ;; `org-capture-finalize' calls `org-capture-goto-last-stored' too
+    ;; early.  We want to wait for the refiling to be over, so we
+    ;; control when the latter function is called.
+    (org-capture-put :kill-buffer nil :jump-to-captured nil)
+    (org-capture-finalize)
+
+    (save-window-excursion
+      (with-current-buffer base
+	(org-with-point-at pos
+	  (call-interactively 'org-refile))))
+    (when kill-buffer
+      (with-current-buffer base (save-buffer))
+      (kill-buffer base)
+      (org-save-and-close-refile-target-buffer))
+    (when jump-to-captured (org-capture-goto-last-stored))))
+
+;; This is a new function added to support the above.
+;; Called from org-capture-refile after the entry has been refiled,
+;; causes us to save and close the org buffer into which the item was
+;; refiled.
+(defun org-save-and-close-refile-target-buffer ()
+  (let ((marker org-capture-last-stored-marker))
+    (if (and marker (marker-buffer marker)
+	     (buffer-live-p (marker-buffer marker)))
+	(let ((buf (marker-buffer marker)))
+	  (with-current-buffer buf (save-buffer))
+	  (kill-buffer buf)))))
+
 (provide 'andrew-org-capture)

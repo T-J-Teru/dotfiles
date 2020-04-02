@@ -189,8 +189,8 @@ current buffer."
         ("MEETING" :foreground "brown" :weight bold)))
 
 (setq org-capture-templates
-      '(("t" "TASK that needs completing" entry
-         (file+headline (concat andrew-org/org-directory "/inbox/tasks.org") "inbox/tasks")
+      `(("t" "TASK that needs completing" entry
+         (file+headline ,(concat andrew-org/org-directory "/inbox/tasks.org") "inbox/tasks")
          "** TODO %?
    SCHEDULED: %t
    :PROPERTIES:
@@ -198,7 +198,7 @@ current buffer."
    :END:
    " :prepend t :kill-buffer t)
         ("m" "Record of a MEETING or phone-call" entry
-         (file+headline (concat andrew-org/org-directory "/inbox/meetings.org") "inbox/meetings")
+         (file+headline ,(concat andrew-org/org-directory "/inbox/meetings.org") "inbox/meetings")
          "** MEETING %?                                                            :meeting:
    CLOSED: %U SCHEDULED: %t
    :PROPERTIES:
@@ -206,14 +206,14 @@ current buffer."
    :END:
    " :prepend t :kill-buffer t)
         ("n" "NOTE some helpful information" entry
-         (file+headline (concat andrew-org/org-directory "/inbox/notes.org") "inbox/notes")
+         (file+headline ,(concat andrew-org/org-directory "/inbox/notes.org") "inbox/notes")
          "** NOTE %?
    :PROPERTIES:
    :ID:       %(shell-command-to-string \"uuidgen\")   :CREATED:  %U
    :END:
    " :prepend t :kill-buffer t)
         ("e" "An EXPENSES record" entry
-         (file+headline (concat andrew-org/org-directory "/inbox/expenses.org") "inbox/expenses")
+         (file+headline ,(concat andrew-org/org-directory "/inbox/expenses.org") "inbox/expenses")
          "** NOTE %?
    :PROPERTIES:
    :ID:       %(shell-command-to-string \"uuidgen\")   :CREATED:  %U

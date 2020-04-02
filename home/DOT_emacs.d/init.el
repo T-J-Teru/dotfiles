@@ -758,6 +758,9 @@ using `abort-recursive-edit'."
 (require 'andrew-org-setup)
 (require 'andrew-work-log)
 
+(when (version<= "9.2" (org-version))
+  (require 'org-tempo))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                      Customisation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

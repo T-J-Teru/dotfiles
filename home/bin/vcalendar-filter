@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+
+# vcalendar-filter is a simple filter to give plain text representations of vcards
+# Copyright (C) 2008  Martyn Smith
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# This script takes a simple VCALENDAR file as input on STDIN and produces a
+# human readable text/plain representation of it on STDOUT
+#
+# It has been designed for use with mutt's auto_view config option, see the
+# README file for more details
+
+use strict;
+use warnings;
+
+use Data::ICal;
+use Text::Autoformat;
+use DateTime::TimeZone;
+
+my $body = eval { local $/ = undef; <> };
+my $calendar = Data::ICal->new(data => $body);
+
+# If parsing failed, try parsing as version 1.0
+$calendar = Data::ICal->new(data => $body, vcal10 => 1) unless $calendar;
+
+# If parsing failed, give up :-(
+unless ( $calendar ) {
+    print "Unable to parse vcalendar: ", $calendar->error_message, "\n";
+    print $body;
+    exit 1;
+}
+
+my %entries;
+foreach my $entry ( @{$calendar->{entries}} ) {
+  my $entry_type = $entry->ical_entry_type;
+  $entries{$entry_type} = [] unless ( exists $entries{$entry_type} );
+  push @{$entries{$entry_type}}, $entry;
+
+  unless ($entry_type eq 'VTIMEZONE' or $entry_type eq 'VEVENT') {
+    print "WARNING: Unknown entry type: ", $entry_type, "\n";
+  }
+}
+
+# Figure out some time zone information.
+my $local_timezone_name = DateTime::TimeZone->new( name => 'local' )->name();
+my $event_timezone_name = $local_timezone_name;
+if ( $entries{VTIMEZONE}->[0] ) {
+  my $tzid = $entries{VTIMEZONE}->[0]->property('tzid')->[0]->decoded_value;
+  if ( $tzid ) {
+    $event_timezone_name = $tzid;
+  }
+}
+
+my $DASH_LINE = ('-' x 72) . "\n";
+
+print $DASH_LINE;
+
+print "\n";
+print "Timezone    : ", $event_timezone_name, "\n";
+print "\n";
+
+foreach my $entry ( @{$entries{VEVENT}} ) {
+  my $properties;
+
+  foreach my $property ( keys %{$entry->properties} ) {
+    next unless defined $entry->property($property);
+    $properties->{$property} = join(', ', map { $_->decoded_value } @{$entry->property($property)});
+    if ( $property eq 'description' ) {
+      $properties->{$property} = "$properties->{$property}";
+      $properties->{$property} = autoformat $properties->{$property}, {
+        all => 1,
+        left => 15,
+      };
+      $properties->{$property} =~ s/^\s*// if defined $properties->{$property};
+    }
+    elsif ( $property =~ m{ \A dt (?: start | end ) \z }xms ) {
+      if ( $properties->{$property} =~ m{ (\d\d\d\d)(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d) }xms ) {
+        $properties->{$property} = "$1-$2-$3 $4:$5";
+
+        # Need to convert EVENT_TIMEZONE_NAME into a DateTime time_zone
+        # name, then initialise this with the 'time_zone' parameter.  After
+        # that we use 'set_time_zone' to change the time zone and then
+        # extract the time fields, which gives us the local time of the
+        # event.
+        my $time = DateTime->new (year => $1,
+                                  month => $2,
+                                  day => $3,
+                                  hour => $4,
+                                  minute => $5,
+                                  second => $6);
+        $time->set_time_zone ( $local_timezone_name );
+      }
+    }
+  }
+
+  print $DASH_LINE;
+
+  foreach my $key ( qw(summary BR description BR location organizer dtstart dtend) ) {
+    if ( $key eq 'BR' ) {
+      print "\n";
+      next;
+    }
+    next unless defined $properties->{$key};
+    my $text = $properties->{$key};
+    printf "%-12s: %s\n", ucfirst $key, $text;
+  }
+}

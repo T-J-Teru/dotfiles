@@ -201,7 +201,9 @@ sub main {
   foreach my $r (@repo)
   {
     print_repo_line ($r, $repo_len, $br_len, $branches, $update, $status, "");
-    foreach my $wt (@{$r->{-worktrees}})
+
+    my @wt = sort {$a->{-name} cmp $b->{-name}} @{$r->{-worktrees}};
+    foreach my $wt (@wt)
     {
       print_repo_line ($wt, $repo_len, $br_len, $branches, $update, $status, "+ ");
     }

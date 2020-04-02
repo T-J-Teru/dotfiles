@@ -55,12 +55,14 @@ proc basic_package_setup { } {
         prepend-path CPATH $pkg_dir/include
     }
 
-    if { [ file isdirectory $pkg_dir/lib/python2.7/site-packages ] } {
-        prepend-path PYTHONPATH $pkg_dir/lib/python2.7/site-packages
-    }
 
-    if { [ file isdirectory $pkg_dir/usr/lib/python2.7/site-packages ] } {
-        prepend-path PYTHONPATH $pkg_dir/usr/lib/python2.7/site-packages
+    foreach dir_prefix {lib lib64 usr/lib} {
+        foreach python_version {2.7 3.7} {
+            set dir ${pkg_dir}/${dir_prefix}/python${python_version}/site-packages
+            if { [ file isdirectory $dir ] } {
+                prepend-path PYTHONPATH $dir
+            }
+        }
     }
 
     if { [ file isdirectory $pkg_dir/lib/perl5 ] } {

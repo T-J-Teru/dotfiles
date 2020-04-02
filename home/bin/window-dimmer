@@ -1,0 +1,16 @@
+#! /bin/bash
+
+# Run the compton window compositor in order to dim out non-selected
+# windows.  This makes visually spotting the selected window much
+# easier.
+
+compton --inactive-dim 0.5 \
+        --focus-exclude='name="screensaver"' \
+        --focus-exclude='!name' \
+        --focus-exclude='class_g="i3-frame"' \
+        --focus-exclude='class_i="rofi"' \
+        --detect-transient
+
+#         --backend xr_glx_hybrid \
+#        --vsync-use-glfinish
+

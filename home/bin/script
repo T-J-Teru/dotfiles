@@ -1,0 +1,5 @@
+#! /bin/bash
+
+export IN_SCRIPT=yes
+
+exec /usr/bin/script $@

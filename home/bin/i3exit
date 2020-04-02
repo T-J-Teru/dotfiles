@@ -1,15 +1,30 @@
 #!/bin/sh
 
 lock() {
-    i3lock
+    xscreensaver-command -lock
+}
+
+function logout() {
+    if test "x${DESKTOP_SESSION}" = "xxfce"
+    then
+        xfce4-session-logout --logout
+    else
+        i3-msg exit
+    fi
+
 }
 
 function confirm() {
     zenity --question \
            --text="Really $1?" \
-           --cancel-label="No" \
-           --ok-label="Yes"
-    return $?
+           --cancel-label="Yes" \
+           --ok-label="No"
+    if [ $? == 1 ]
+    then
+        return 0
+    else
+        return 1
+    fi
 }
 
 case "$1" in
@@ -17,7 +32,7 @@ case "$1" in
         lock
         ;;
     logout)
-        confirm logout && i3-msg exit
+        confirm logout && logout
         ;;
     suspend)
         confirm suspend && lock && systemctl suspend

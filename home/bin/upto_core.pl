@@ -2,17 +2,97 @@
 
 use strict;
 use warnings;
+use Cwd qw/getcwd/;
+use Getopt::Long;
 
-my $pattern = shift;
-my $pwd = shift;
+exit (main ());
 
-sub usage()
-{
-  print "Usage: $0 <pattern> <path>\n";
-  die;
+sub main {
+  my ($pattern, $path, $complete, $run_tests);
+  GetOptions ("pattern=s" => \$pattern,
+              "path=s" => \$path,
+              "completions:s" => \$complete,
+              "test" => \$run_tests);
+
+  if (defined $run_tests)
+  {
+    run_tests ();
+    return 0;
+  }
+
+  if (defined $complete)
+  {
+    (defined $path) or $path = getcwd ();
+
+    (defined $pattern) and
+      die "Can't use --pattern with --completions\n";
+    show_completions ($complete, $path);
+    return 0;
+  }
+
+  if (defined $pattern)
+  {
+    (defined $path) or $path = getcwd ();
+    show_destination ($path, $pattern);
+    return 0
+  }
+
+  if (scalar (@ARGV) == 2)
+  {
+    # This is backwards compatibility.  My bash scripts didn't used to use
+    # the command line flags, so handle this case.
+    $pattern = $ARGV[0];
+    $path = $ARGV[1];
+    show_destination ($path, $pattern);
+    return 0
+  }
+
+  print ("Missing --pattern and --path command line flags.\n");
+  return 1;
 }
 
-sub get_dest 
+sub show_completions {
+  my $pattern = shift;
+  my $path = shift;
+
+  # Count the number of '/' characters in the pattern.
+  my $sep_count = ($pattern =~ tr~/~~);
+
+  my @parts = split m~/~, $path;
+  if ($parts[0] eq "")
+  {
+    shift @parts;
+  }
+  my @completions;
+
+  #print "Splitting: $path\n";
+  #print "     Into: ".join (" / ", @parts)."\n";
+  #print "Sep count = $sep_count\n";
+  for (my $i = 0; $i < (scalar (@parts) - $sep_count); $i++)
+  {
+    #print "  Start at: $i\n";
+    my @p;
+    for (my $j = 0; $j <= $sep_count; $j++)
+    {
+      #print "    Taking index: ".($i + $j)."\n";
+      push @p, $parts[$i + $j];
+      #print "    Got: ".join (" / ", @p)."\n";
+    }
+    push @completions, join ("/", @p);
+  }
+
+  @completions = sort @completions;
+  print join (" ", @completions);
+}
+
+sub show_destination {
+  my $path = shift;
+  my $pattern = shift;
+
+  print get_dest($path, $pattern);
+}
+
+sub get_dest
 {
   # If we are in here: /xx/b/c/a/b/c
   # and use the pattern: a
@@ -38,18 +118,15 @@ sub get_dest
   return $res;
 }
 
-
-if ( exists $ENV{UPTO_CORE_TEST} )
-{
-  my $test_id = 1;
-  sub test
-  {
+sub run_tests {
+  our $test_id = 1;
+  sub test {
     my $src = shift;
     my $pattern = shift;
     my $dest = shift;
-    
+
     my $res = get_dest($src, $pattern);
-    printf("%6d ... ", $test_id);    
+    printf("%6d ... ", $test_id);
     if ( $res eq $dest )
     {
       printf("PASS\n");
@@ -63,24 +140,16 @@ if ( exists $ENV{UPTO_CORE_TEST} )
       printf("        -   result: $res\n");
     }
     $test_id++;
-  }  
-  
+  }
+
   test("/abc/def/ghi", "ef",  "/abc/def");
   test("/abc/def/ghi", "de",  "/abc/def");
   test("/abc/def/ghi", "def", "/abc/def");
   test("/abc/def/ghi", "c/d", "/abc/def");
-  test("/abc/def/ghi", "/a",  "/abc"); 
-  
+  test("/abc/def/ghi", "/a",  "/abc");
+
   test("/abc/def/ghi", "ghi", "/abc/def/ghi");
   test("/abc/abc/abc", "abc", "/abc/abc/abc");
   test("/abc/abc/def", "abc/", "/abc/abc");
   test("/abc/abc/def", "b", "/abc/abc");
 }
-else
-{
-  defined $pattern or usage();
-  defined $pwd or usage();
-  
-  print get_dest($pwd, $pattern);
-}
-

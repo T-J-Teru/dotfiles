@@ -665,7 +665,7 @@ function upto()
       return 1
   fi
 
-  DEST=`${WORKER} "${PATTERN}" "${PWD}"`
+  DEST=`${WORKER} --pattern "${PATTERN}" --path "${PWD}"`
 
   # We get the empty 
   if [ -z ${DEST} ]

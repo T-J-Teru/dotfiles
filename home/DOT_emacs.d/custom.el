@@ -18,7 +18,6 @@
      (:name "recent-unread" :query "tag:unread AND date:2h.. AND NOT tag:buildroot" :search-type tree)
      (:name "recent-inbox" :query "tag:unread AND tag:inbox AND date:24h.." :search-type tree)
      (:name "todo" :query "tag:todo" :search-type tree))))
- '(package-selected-packages (quote (avy which-key git-commit)))
  '(send-mail-function (quote smtpmail-send-it))
  '(template-use-package t nil (template)))
 (custom-set-faces

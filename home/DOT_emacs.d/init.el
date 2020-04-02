@@ -649,6 +649,18 @@ using `abort-recursive-edit'."
 (require 'hideshow)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                    Semantic
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(eval-after-load "semantic"
+  ;; Ensure that this face is useable on low color displays.
+  (face-spec-set 'semantic-highlight-func-current-tag-face
+    '((((class color) (min-colors 88)) :background "gray90")
+      (((class color) (min-colors 8))
+       :background "white" :foreground "black")
+      (t :inverse-video t))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                   Setup `browse-kill-ring'
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

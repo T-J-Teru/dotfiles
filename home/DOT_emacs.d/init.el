@@ -294,6 +294,19 @@ removing\nany \\r characters."
 (global-set-key (kbd "C-c N") 'global-linum-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;               Jumping to top, centre, and bottom
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; When we jump to the top or bottom place the focused line 5 lines
+;; from the edge of the screen.  I don't want to set scroll-margin
+;; globally as I like actual scrolling to kick in only at the edge of
+;; the frame.
+(global-set-key (kbd "C-l") (lambda ()
+                              (interactive)
+                              (let ((scroll-margin 5))
+                                (recenter-top-bottom))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Template System
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -723,6 +723,9 @@ using `abort-recursive-edit'."
 ;;;;                Setup `notmuch' email client
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(use-package notmuch
+  :ensure t)
+
 ;; Setup notmuch email system.
 (autoload 'notmuch "notmuch" "Notmuch mail" t)
 (with-eval-after-load "notmuch"

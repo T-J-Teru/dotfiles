@@ -730,6 +730,14 @@ using `abort-recursive-edit'."
 (use-package hideshow
   :ensure t)
 
+;; Autocomplete.
+(use-package auto-complete
+  :ensure t)
+
+;; Magit
+(use-package magit
+  :ensure t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Semantic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

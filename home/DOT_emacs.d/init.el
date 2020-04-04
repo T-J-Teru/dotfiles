@@ -614,8 +614,11 @@ using `abort-recursive-edit'."
 (use-package multiple-cursors
   :ensure t
   :bind
-  (("C-c e" . 'mc/edit-lines)
-   ("C-c ?" . 'ace-mc-add-char)))
+  (("C-c e" . 'mc/edit-lines)))
+
+(use-package ace-mc
+  :ensure t
+  :bind (("C-c ?" . 'ace-mc-add-single-cursor)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                     Header Line

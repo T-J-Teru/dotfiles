@@ -376,6 +376,23 @@ removing\nany \\r characters."
                                (hl-line-mode 1)
                                (ibuffer-auto-mode)))
 
+;; The formats used for `ibuffer'.  I've added my own formats into the
+;; list, but the originals are still there too.
+(setq ibuffer-formats
+      '((mark modified read-only locked " "
+              (name 18 18 :left :elide)
+              " "
+              (size 9 -1 :right)
+              " "
+              (mode 16 16 :left :elide)
+              " " filename-and-process)
+        (mark " "
+              (name 30 -1)
+              " " filename)
+        (mark " "
+              (name 16 -1)
+              " " filename)))
+
 ;; Advise the ibuffer redisplay engine to force update of the line
 ;; highlighting, this resolves an issue where the highlight is not
 ;; displayed correctly when the ibuffer buffer is first shown.

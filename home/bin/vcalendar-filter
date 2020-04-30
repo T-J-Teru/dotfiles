@@ -26,8 +26,12 @@ use strict;
 use warnings;
 
 use Data::ICal;
-use Text::Autoformat;
 use DateTime::TimeZone;
+use DateTime::Format::ICal;
+use DateTime::TimeZone::ICal;
+
+use Text::Autoformat;
+use Term::ANSIColor;
 
 my $body = eval { local $/ = undef; <> };
 my $calendar = Data::ICal->new(data => $body);
@@ -42,78 +46,99 @@ unless ( $calendar ) {
     exit 1;
 }
 
-my %entries;
-foreach my $entry ( @{$calendar->{entries}} ) {
+# Generate a table of time zones, and a list of all calendar events.
+my (%tz, @events);
+for my $entry (@{$calendar->entries})
+{
   my $entry_type = $entry->ical_entry_type;
-  $entries{$entry_type} = [] unless ( exists $entries{$entry_type} );
-  push @{$entries{$entry_type}}, $entry;
 
-  unless ($entry_type eq 'VTIMEZONE' or $entry_type eq 'VEVENT') {
+  if ($entry_type eq 'VTIMEZONE')
+  {
+    my $dtz = DateTime::TimeZone::ICal->from_ical_entry($entry);
+    $tz{$dtz->name} = $dtz;
+  }
+  elsif ($entry_type eq 'VEVENT')
+  {
+    push @events, $entry;
+  }
+  else
+  {
     print "WARNING: Unknown entry type: ", $entry_type, "\n";
   }
 }
 
-# Figure out some time zone information.
-my $local_timezone_name = DateTime::TimeZone->new( name => 'local' )->name();
-my $event_timezone_name = $local_timezone_name;
-if ( $entries{VTIMEZONE}->[0] ) {
-  my $tzid = $entries{VTIMEZONE}->[0]->property('tzid')->[0]->decoded_value;
-  if ( $tzid ) {
-    $event_timezone_name = $tzid;
-  }
-}
+my $local_tz = DateTime::TimeZone->new( name => 'local' )->name();
 
-my $DASH_LINE = ('-' x 72) . "\n";
+my $DASH_LINE = "\n" . ('-' x 72) . "\n\n";
 
-print $DASH_LINE;
-
-print "\n";
-print "Timezone    : ", $event_timezone_name, "\n";
-print "\n";
-
-foreach my $entry ( @{$entries{VEVENT}} ) {
-  my $properties;
-
-  foreach my $property ( keys %{$entry->properties} ) {
-    next unless defined $entry->property($property);
-    $properties->{$property} = join(', ', map { $_->decoded_value } @{$entry->property($property)});
-    if ( $property eq 'description' ) {
-      $properties->{$property} = "$properties->{$property}";
-      $properties->{$property} = autoformat $properties->{$property}, {
-        all => 1,
-        left => 15,
-      };
-      $properties->{$property} =~ s/^\s*// if defined $properties->{$property};
-    }
-    elsif ( $property =~ m{ \A dt (?: start | end ) \z }xms ) {
-      if ( $properties->{$property} =~ m{ (\d\d\d\d)(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d) }xms ) {
-        $properties->{$property} = "$1-$2-$3 $4:$5";
-
-        # Need to convert EVENT_TIMEZONE_NAME into a DateTime time_zone
-        # name, then initialise this with the 'time_zone' parameter.  After
-        # that we use 'set_time_zone' to change the time zone and then
-        # extract the time fields, which gives us the local time of the
-        # event.
-        my $time = DateTime->new (year => $1,
-                                  month => $2,
-                                  day => $3,
-                                  hour => $4,
-                                  minute => $5,
-                                  second => $6);
-        $time->set_time_zone ( $local_timezone_name );
-      }
-    }
-  }
-
+foreach my $entry ( @events )
+{
   print $DASH_LINE;
 
-  foreach my $key ( qw(summary BR description BR location organizer dtstart dtend) ) {
-    if ( $key eq 'BR' ) {
+  foreach my $prop_name ( qw(summary
+                             BR
+                             description
+                             BR
+                             location
+                             organizer
+                             dtstart
+                             dtend) )
+  {
+    # Handle blank line.
+    if ( $prop_name eq 'BR' ) {
       print "\n";
       next;
     }
-    next unless defined $properties->{$key};
-    my $text = $properties->{$key};
-    printf "%-12s: %s\n", ucfirst $key, $text;
+
+    # Now process each property.  Each property can actually have an array
+    # of values.
+    foreach my $property (@{$entry->property ($prop_name)})
+    {
+      # TODO: This color call doesn't seem to work when viewing entries in
+      # mutt.
+      print color ('red');
+      printf "%-12s: ", ucfirst $prop_name;
+      print color ('reset');
+
+      if ($prop_name eq 'description')
+      {
+        my $text = autoformat $property->decoded_value (), {
+          all => 1,
+          left => 15,
+        };
+        $text =~ s/^\s*// if defined ($text);
+        print $text;
+      }
+      elsif ($prop_name eq 'dtstart' || $prop_name eq 'dtend')
+      {
+        # Get the time zone key from the property parameters.
+        my $tzid = $property->parameters->{TZID};
+
+        # Convert the date in the ordinary fashion.
+        my $dt = DateTime::Format::ICal->parse_datetime($property->value);
+
+        # First Set the timezone to that of the event, and then change it
+        # to the local timezone.  This will update the event to reflect the
+        # actual local time.
+        $dt->set_time_zone($tz{$tzid}) if $tzid and $tz{$tzid};
+        my $str = $dt->datetime (' ') ."\t($tzid)";
+
+        $dt->set_time_zone($local_tz);
+        print $dt->datetime (' ')."\t($local_tz)";
+
+        if ($tzid and ($local_tz ne $tzid))
+        {
+          print "\n".(' 'x14)."[ ".$str." ]";
+        }
+      }
+      else
+      {
+        # These are generally short string properties.
+        printf $property->decoded_value ();
+      }
+      print "\n";
+    }
   }
 }
+
+print $DASH_LINE;

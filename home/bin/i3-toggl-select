@@ -1,0 +1,25 @@
+#! /bin/bash
+
+rofibin=rofi
+
+project=`(echo "nothing"; toggl projects ls | tail -n +2 | awk '{ print $1 }' ) \
+               | ${rofibin} -p "project: " -only-match -dmenu -i -theme arthur`
+
+# No task name selected, means don't change anything.
+if [ -z "${project}" ]
+then
+    exit 0
+fi
+
+# Stop working on the current project, and start working on the newly
+# selected one.
+toggl stop &> /dev/null
+if [ "${project}" != "nothing" ]
+then
+    toggl start -o ${project} "" &>/dev/null
+fi
+
+# This wakes up i3 status, and should cause it to refresh the toggl
+# task being displayed.
+killall -USR1 py3status
+killall -USR1 i3status

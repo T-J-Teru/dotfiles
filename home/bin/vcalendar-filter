@@ -121,7 +121,8 @@ foreach my $entry ( @events )
         # to the local timezone.  This will update the event to reflect the
         # actual local time.
         $dt->set_time_zone($tz{$tzid}) if $tzid and $tz{$tzid};
-        my $str = $dt->datetime (' ') ."\t($tzid)";
+        my $str = $dt->datetime (' ');
+        $str .= "\t($tzid)" if ($tzid);
 
         $dt->set_time_zone($local_tz);
         print $dt->datetime (' ')."\t($local_tz)";

@@ -715,6 +715,14 @@ using `abort-recursive-edit'."
 ;; mode.
 (cua-selection-mode 1)
 
+;; Override a method from within cua-mode that is broken.
+(defun cua-cancel ()
+  "Cancel the active region, rectangle, or global mark."
+  (interactive)
+  (deactivate-mark)
+  (if (fboundp 'cua--cancel-rectangle)
+      (cua--cancel-rectangle)))
+
 ;; Move the mouse pointer away from the cursor.  This is mostly
 ;; redundant now, as most systems I use these days hide the mouse
 ;; cursor when I start typing.

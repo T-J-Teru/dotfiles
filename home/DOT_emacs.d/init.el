@@ -484,9 +484,10 @@ using `abort-recursive-edit'."
 (setq version-control 'never)
 
 ;; Activate a nice mode for editing git commit messages.
-(require 'git-commit)
-(add-hook 'git-commit-setup-hook 'flyspell-mode)
-(add-hook 'git-commit-setup-hook 'fci-mode)
+(use-package git-commit
+  :config
+  (add-hook 'git-commit-setup-hook 'flyspell-mode)
+  (add-hook 'git-commit-setup-hook 'fci-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                     Configure Grep

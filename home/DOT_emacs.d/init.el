@@ -23,7 +23,8 @@
 ;; Disable both horizontal and vertical scroll bars.  Older versions
 ;; of emacs don't support horizontal scroll bars, hence the extra care
 ;; in this case.
-(set-scroll-bar-mode nil)
+(if (fboundp 'set-scroll-bar-mode)
+    (set-scroll-bar-mode nil))
 (if (fboundp 'horizontal-scroll-bar-mode)
     (horizontal-scroll-bar-mode -1))
 

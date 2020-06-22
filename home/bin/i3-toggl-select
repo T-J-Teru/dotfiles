@@ -44,7 +44,7 @@ function get_project_list ()
 
 # Allow the user to select the project to switch too.
 project=$(get_project_list \
-              | ${rofibin} -p "project: " -only-match -dmenu -i -theme arthur)
+              | ${rofibin} -p "project: " -no-custom -dmenu -i -theme arthur)
 
 # Start an update of the project list in the background.
 update_toggl_projects &

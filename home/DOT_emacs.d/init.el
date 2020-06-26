@@ -760,6 +760,23 @@ using `abort-recursive-edit'."
 (use-package magit
   :ensure t)
 
+;; Region face.  Set this to avoid making use of the GTK colours,
+;; which (a) are rubbish, and (b) I can't figure out how to change!
+(face-spec-set 'region
+  '((((class color) (min-colors 88) (background dark))
+     :background "blue3")
+    (((class color) (min-colors 88) (background light))
+     :background "lightgoldenrod1")
+    (((class color) (min-colors 16) (background dark))
+     :background "blue3")
+    (((class color) (min-colors 16) (background light))
+     :background "lightgoldenrod1")
+    (((class color) (min-colors 8))
+     :background "blue" :foreground "white")
+    (((type tty) (class mono))
+     :inverse-video t)
+    (t :background "gray")))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Semantic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

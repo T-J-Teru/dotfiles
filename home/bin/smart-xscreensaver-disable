@@ -1,0 +1,26 @@
+#! /bin/bash
+
+# This script should be installed as the XFCE heartbeat-command
+# handler.  It will stop xscreensaver from activating if the screen is
+# not already locked.
+#
+# However, if the screen is already locked then this script does
+# nothing.
+#
+# The motivation is that running `xscreensaver-command -deactivate'
+# when the screen is already locked causes the password entry dialog
+# to appear on screen.  This is unpleasent.  So, if I have screensaver
+# blocking enabled, but then manually lock the screen this script
+# ensures that we no longer poke xscreensaver.
+#
+# To install this script run:
+#
+#  xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/heartbeat-command -s /path/to/script
+
+XSCREENSAVER_COMMAND=xscreensaver-command
+
+# If the screensaver is currently not active, then stop it from
+# activating.
+if ${XSCREENSAVER_COMMAND} -time | grep non-blanked; then
+    ${XSCREENSAVER_COMMAND} -deactivate
+fi

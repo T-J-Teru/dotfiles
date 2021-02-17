@@ -1,13 +1,26 @@
 #! /bin/sh
 
 function do_colour () {
-        pygmentize -g "$1"
-        exit $?
+    infile=$1
+    lexer=$2
+
+    if [ -n "${lexer}" ]; then
+        lexer="-l $lexer"
+    fi
+
+    pygmentize ${lexer} "$1"
+    exit $?
 }
 
 case "$1" in
-    *.c|*.sh|*.cc|*.cpp|*.h|*.H|*.pl|*.py|*.R|*.patch|*.f90|*.f)
+    *.c|*.sh|*.cc|*.cpp|*.h|*.H|*.pl|*.py|*.R|*.patch)
         do_colour "$1"
+        ;;
+    *.f90|*.F90|*.f)
+        do_colour "$1" "fortran"
+        ;;
+    *.exp)
+        do_colour "$1" "tcl"
         ;;
     ?*.*)
         exit 1

@@ -3,4 +3,14 @@
 cpu_count=`cat /proc/cpuinfo 2>/dev/null | grep -c ^processor`
 parallel_count=$(echo $cpu_count | awk '{printf "%d\n", $1 + 1}')
 
-exec make -O -j ${parallel_count} -l ${parallel_count} "$@"
+BEAR=
+case "$PWD" in
+    $HOME/projects/binutils-gdb/build*)
+
+        if which bear 2>/dev/null >/dev/null; then
+            BEAR="bear --append"
+        fi
+        ;;
+esac
+
+exec ${BEAR} make --no-print-directory -O -j ${parallel_count} -l ${parallel_count} "$@"

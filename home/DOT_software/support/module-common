@@ -60,12 +60,29 @@ set path_blacklist {}
 proc my-prepend-path { varname path } {
     if { [lsearch -exact $::path_blacklist $path] } {
         prepend-path ${varname} ${path}
+
+        # This is an attempt to keep ccache at the front of my $PATH.
+        # I suspect that it may turn out that I need to check more
+        # modes than this.
+        if { $varname == "PATH" && [module-info mode] == "load" } {
+            remove-path ${varname} /usr/lib64/ccache
+            prepend-path ${varname} /usr/lib64/ccache
+        }
+    }
+}
+
+# Call append-path passing VARNAME and PATH, unless PATH has
+# previously been the subject of a call to blacklist_path, in which
+# case this call is ignored.
+proc my-append-path { varname path } {
+    if { [lsearch -exact $::path_blacklist $path] } {
+        append-path ${varname} ${path}
     }
 }
 
 # Add PATH to the blacklist.  This ensures that any future call to
-# my-prepend-path with PATH will not add PATH to the environment
-# variable.
+# my-prepend-path and my-append-path with PATH will not add PATH to
+# the environment variable.
 proc my-blacklist-path { path } {
     lappend ::path_blacklist $path
 }
@@ -152,8 +169,15 @@ proc basic_package_setup { } {
         my-prepend-path PERL5LIB $pkg_dir/lib/perl5
     }
 
-    if { [ file isdirectory $pkg_dir/lib64 ] } {
-        my-prepend-path LD_LIBRARY_PATH $pkg_dir/lib64
+    foreach lib_dir {lib lib64} {
+        if { [ file isdirectory $pkg_dir/${lib_dir} ] } {
+            my-prepend-path LD_LIBRARY_PATH $pkg_dir/${lib_dir}
+        }
+    }
+
+    foreach dir [glob -nocomplain -type d $pkg_dir/share/aclocal-* \
+                     $pkg_dir/share/aclocal*] {
+        my-prepend-path ACLOCAL_PATH $dir
     }
 
     #
@@ -161,13 +185,12 @@ proc basic_package_setup { } {
     #
 
     if { $pkg == "automake" } {
-       foreach dir [glob -type d $pkg_dir/share/aclocal-*] {
-           my-prepend-path ACLOCAL_PATH $dir
-       }
-       foreach dir [glob -type d /usr/share/aclocal-*] {
-           my-prepend-path ACLOCAL_PATH $dir
-       }
-       my-prepend-path ACLOCAL_PATH /usr/share/aclocal
+        # These paths are appended, as we only want to search these if
+        # suitable modules are not found elsewhere.
+        foreach dir [glob -nocomplain -type d /usr/share/aclocal-*] {
+            my-append-path ACLOCAL_PATH $dir
+        }
+        my-append-path ACLOCAL_PATH /usr/share/aclocal
     }
 }
 

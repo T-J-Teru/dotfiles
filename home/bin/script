@@ -2,4 +2,4 @@
 
 export IN_SCRIPT=yes
 
-exec /usr/bin/script $@
+exec /usr/bin/script "$@"

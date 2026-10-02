@@ -60,6 +60,126 @@ The following methods are defined in this script.
 
 =pod
 
+=item B<cleanup_module>
+
+Currently undocumented.
+
+=cut
+
+sub cleanup_module {
+  my $root = shift;
+  my $module = shift;
+
+  my $p_path = "$root/packages/$module";
+  my $m_path = "$root/modules/$module";
+
+  if ( not -d $p_path )
+  {
+    print "Package '$module' has been deleted, remove module directory:\n";
+    print "    $m_path/\n";
+    return;
+  }
+
+  opendir my $dh, $m_path
+    or croak ("failed to open '$m_path': $!");
+
+  while (my $ver = readdir $dh)
+  {
+    next if ($ver =~ m/^\./ and $ver ne ".version");
+
+    my $package_version;
+    if ($ver eq ".version")
+    {
+      $package_version = "default";
+    }
+    else
+    {
+      $package_version = $ver;
+    }
+
+    if (not -e "$p_path/$package_version")
+    {
+      if ($ver eq ".version")
+      {
+        print "Default removed for package $module\n";
+      }
+      else
+      {
+        print "Deleted version $ver for package $module\n";
+      }
+
+      unlink "$m_path/$ver" or
+        croak "Failed to delete '$m_path/$ver";
+    }
+  }
+
+  closedir $dh
+    or croak ("failed to close '$m_path': $!");
+}
+
+#========================================================================#
+
+=pod
+o
+=item B<cleanup_old_modules>
+
+Currently undocumented.
+
+=cut
+
+sub cleanup_old_modules {
+  my $root = shift;
+
+  my $p_path = "$root/packages";
+  my $m_path = "$root/modules";
+
+  opendir my $dh, $m_path
+    or croak ("failed to open '$m_path': $!");
+
+  while (my $m = readdir $dh)
+  {
+    next if ($m =~ m/^\./);
+    cleanup_module ($root, $m);
+  }
+
+  closedir $dh
+    or croak ("failed to close '$m_path': $!");
+}
+
+#========================================================================#
+
+=pod
+
+=item B<create_new_modules>
+
+Look through the packages, and create module files for any new
+packages, and update the default version.
+
+=cut
+
+sub create_new_modules {
+  my $root = shift;
+
+  my $p_path = "$root/packages";
+  my $m_path = "$root/modules";
+
+  opendir my $dh, $p_path
+    or croak ("failed to open '$p_path': $!");
+
+  while (my $p = readdir $dh)
+  {
+    next if ($p =~ m/^\./);
+    sync_package_versions ($root, $p);
+  }
+
+  closedir $dh
+    or croak ("failed to close '$p_path': $!");
+}
+
+#========================================================================#
+
+=pod
+
 =item B<sync_package_default>
 
 Currently undocumented.
@@ -273,20 +393,9 @@ needed.
 sub sync_all_packages {
   my $root = shift;
 
-  my $p_path = "$root/packages";
-  my $m_path = "$root/modules";
+  create_new_modules ($root);
 
-  opendir my $dh, $p_path
-    or croak ("failed to open '$p_path': $!");
-
-  while (my $p = readdir $dh)
-  {
-    next if ($p =~ m/^\./);
-    sync_package_versions ($root, $p);
-  }
-
-  closedir $dh
-    or croak ("failed to close '$p_path': $!");
+  cleanup_old_modules ($root);
 
   print "All packages synced.\n";
 

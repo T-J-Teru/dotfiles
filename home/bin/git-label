@@ -61,8 +61,8 @@ sub handle_arg
 GetOptions ("add=s" => \&handle_arg, "remove=s" => \&handle_arg);
 $config->{base} = shift @ARGV;
 
-validate_labels (@{$config->{add}});
-validate_labels (@{$config->{remove}});
+validate_labels ($config->{add});
+validate_labels ($config->{remove});
 
 if (defined $config->{base})
 {
@@ -273,7 +273,10 @@ Currently undocumented.
 =cut
 
 sub validate_labels {
-  my @labels = @_;
+  my $labels_ref = shift;
+
+  my @labels = @$labels_ref;
+  @$labels_ref = ();
 
   foreach my $label (@labels)
   {
@@ -283,9 +286,14 @@ sub validate_labels {
       my $name = $2;
       my $email = $3;
 
-      my @all_tags = qw/Approved-By Reviewed-By Co-Authored-By Tested-By/;
+      my @all_tags = qw/Approved-By Reviewed-By Co-Authored-By Tested-By Acked-By/;
 
-      if (not (first { $tag eq $_ } @all_tags))
+      my $matching_tag = first { uc ($tag) eq uc ($_) } @all_tags;
+      if ($matching_tag)
+      {
+        push @$labels_ref, "$matching_tag: $name <$email>";
+      }
+      else
       {
         die "Invalid tag '$tag'";
       }

@@ -33,6 +33,85 @@ if [ "$?" == 2 ]; then
   fi
 fi
 
+#======================================#
+#    Red Hat Claude Code Settings      #
+#======================================#
+source ~/.bash.d/claude
+
+#======================================#
+#     GDB Testing Related Settings     #
+#======================================#
+
+# These are users that can be ssh'd to on the local machine without a
+# password.  These users are used as part of GDB's full testing.
+export GDB_HOST_USERNAME=remote-host
+export GDB_TARGET_USERNAME=remote-target
+
+#==========================#
+#     Setup some paths     #
+#==========================#
+
+export MANPATH=${MANPATH}
+export INFOPATH=${INFOPATH}:/usr/share/info
+export PATH=${HOME}/bin:${HOME}/.python/bin:${PATH}
+
+#===============================#
+#           Perl Setup          #
+#===============================#
+
+export PERL_LOCAL_LIB_ROOT="$PERL_LOCAL_LIB_ROOT:$HOME/perl5";
+export PERL_MB_OPT="--install_base $HOME/perl5";
+export PERL_MM_OPT="INSTALL_BASE=$HOME/perl5";
+export PERL5LIB="$HOME/perl5/lib/perl5:$PERL5LIB";
+export PATH="$HOME/perl5/bin:$PATH";
+
+#===============================#
+#         Python Setup          #
+#===============================#
+
+export PYTHONUSERBASE=$HOME/.python
+
+#===================================#
+#     Source global definitions     #
+#===================================#
+
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+#=======================================#
+#         Setup Default Modules         #
+#=======================================#
+
+export PACKAGE_MODULE_ROOT=$HOME/.software
+MODULES_ROOT_DIRECTORY=${PACKAGE_MODULE_ROOT}/modules
+if [ -d "${MODULES_ROOT_DIRECTORY}" ]
+then
+    DEFAULT_MODULE_LIST=""
+    for versionfile in `find ${MODULES_ROOT_DIRECTORY} -name ".version" 2>/dev/null`
+    do
+        dir=`dirname $versionfile`
+        modulename=`basename $dir`
+        DEFAULT_MODULE_LIST="${DEFAULT_MODULE_LIST} ${modulename}"
+    done
+    # Not sure this 'purge' is a good idea.  This removes all loaded
+    # modules so that the following load will result in a clean (just
+    # the defaults) loaded in each new shell.  The problem is that if
+    # I start a new termainl/shell from within an existing
+    # terminal/shell then I'd probably expect the current state to
+    # carry over.
+    #
+    # However, I added this because the session shell also picks up
+    # the defaults at the point in time I start my session, then every
+    # shell after that keeps the same defaults.  If I then change the
+    # default for a particular package that default is loaded as well
+    # as the original default.
+    module purge
+    module -s load ${DEFAULT_MODULE_LIST} &>/dev/null
+else
+    echo "No modules directory: ${MODULES_ROOT_DIRECTORY}"
+fi
+
 #=====================================#
 #     Check for interactive shell     #
 #=====================================#
@@ -48,19 +127,15 @@ esac
 
 shopt -s direxpand
 
-#===================================#
-#     Source global definitions     #
-#===================================#
-
-if [ -f /etc/bashrc ]; then
-	. /etc/bashrc
-fi
-
 #======================================#
 #     flow control Ctrl-X for stop     #
 #======================================#
 
-stty stop ^X
+## Not sure why this is here, this messes with GDB C-x C-a for
+## entering TUI mode.
+## Use 'stty -a' to view all the current setting.
+
+## stty stop ^X
 
 #=================#
 #     aliases     #
@@ -87,11 +162,13 @@ alias grep='grep --color=auto -I --exclude="*~"'
 alias pgrep='pgrep -f'
 alias pkill='pkill -f'
 
+alias id3v2='mid3v2'
+
 [ -e "$HOME/.dircolors" ] && DIR_COLORS="$HOME/.dircolors"
 [ -e "$DIR_COLORS" ] || DIR_COLORS=""
 eval "`dircolors -b $DIR_COLORS`"
 
-export LESS="-S -R -i"
+export LESS="-S -R -i -j5"
 export LESSOPEN="||/usr/bin/lesspipe.sh %s"
 
 export SHORT_HOSTNAME=$HOSTNAME
@@ -101,15 +178,6 @@ export PAGER=less
 export CVSEDITOR=${EDITOR}
 
 export LANG=en_GB.UTF-8
-
-export TDL_DATABASE=$HOME/.tdldb
-export TDL_LIST_COLOURS="PRI_HIGH=red"
-
-export GDBVER=7.7
-export GCCVER=4.7.2
-export BINUTILSVER=2.22
-export GRAPHVIZVER=2.30.1
-export FP_GUILE_VERSION=1.8.5
 
 #======================================#
 #    Protect agsint Ctrl-D mishaps     #
@@ -123,6 +191,7 @@ export IGNOREEOF=2
 #====================================#
 #    For warnings during startup     #
 #====================================#
+
 function warning ()
 {
   MSG=$1
@@ -221,12 +290,9 @@ function xtitle
 # Change to default, auto-updating, window title.
 xtitle ""
 
-#==============#
-#     path     #
-#==============#
-
-export MANPATH=${MANPATH}
-export INFOPATH=${INFOPATH}:/usr/share/info
+#===========================#
+#     Path Manipulation     #
+#===========================#
 
 # Take a directory, add it to the path.
 #
@@ -299,13 +365,14 @@ function addpath
 }
 
 addpath --quiet $HOME/bin
+addpath /usr/lib64/ccache
 
 function rmpath () {
     local target=$1
     target=$(cd $target && pwd)
 
     new_path=
-    while IFS= read -rd: dir; do
+    while IFS=: read -rd: dir; do
         if [ "$dir" != "$target" ]
         then
             if [ -z "$new_path" ]
@@ -315,31 +382,11 @@ function rmpath () {
                 new_path=$new_path:$dir
             fi
         fi
-    done < <(printf %s "$PATH")
+    done < <(printf %s: "$PATH")
 
     PATH=$new_path
     return 0
 }
-
-#=======================================#
-#         Setup Default Modules         #
-#=======================================#
-
-export PACKAGE_MODULE_ROOT=$HOME/.software
-MODULES_ROOT_DIRECTORY=${PACKAGE_MODULE_ROOT}/modules
-if [ -d "${MODULES_ROOT_DIRECTORY}" ]
-then
-    DEFAULT_MODULE_LIST=""
-    for versionfile in `find ${MODULES_ROOT_DIRECTORY} -name ".version" 2>/dev/null`
-    do
-        dir=`dirname $versionfile`
-        modulename=`basename $dir`
-        DEFAULT_MODULE_LIST="${DEFAULT_MODULE_LIST} ${modulename}"
-    done
-    module -s load ${DEFAULT_MODULE_LIST} &>/dev/null
-else
-    echo "No modules directory: ${MODULES_ROOT_DIRECTORY}"
-fi
 
 #==================================================#
 #     Setup An EMAIL Environment Variable          #
@@ -468,7 +515,7 @@ function custom-cd ()
           echo ${dir} | grep -e '^\.*$' >/dev/null 2>/dev/null
           if [ $? == 0 ]
           then
-            # This matches the pattern "\.\.\.+", so lets move 
+            # This matches the pattern "\.\.\.+", so lets move
             # backwards up the dir tree by the (length($dir) - 2)
             # Record where we start.
             local initial_dir=${PWD}
@@ -622,7 +669,7 @@ function monitor
 #     Pretty PWD     #
 #====================#
 # Take a string which could really be anything, but add the strings
-# required for bash to add colour to it. Allows paths to take a 
+# required for bash to add colour to it. Allows paths to take a
 # uniform colour.
 function colourize_path
 {
@@ -667,7 +714,7 @@ function upto()
 
   DEST=`${WORKER} --pattern "${PATTERN}" --path "${PWD}"`
 
-  # We get the empty 
+  # We get the empty list if nothing matches pattern.
   if [ -z ${DEST} ]
   then
     echo -e "!! Pattern not found: '${PATTERN}'";
@@ -695,7 +742,7 @@ alias jmp='upto'
 #=============================================================#
 
 # Due to the use of my custom-cd function, if I'm in a
-# directory that gets deleted then trying to cd out of it will 
+# directory that gets deleted then trying to cd out of it will
 # not work, bah!  This escape function gets we to the closest
 # ancestor directory that still exists.
 
@@ -810,23 +857,23 @@ function vnc()
         /tools/bin/vncserver -geometry $new_geom -depth 24 -name "`uname -n` `id -un` $wm"
 }
 
-#===============================#
-#           Perl Setup          #
-#===============================#
+#===========================================#
+#           Display The Weather             #
+#===========================================#
 
-export PERL_LOCAL_LIB_ROOT="$PERL_LOCAL_LIB_ROOT:$HOME/perl5";
-export PERL_MB_OPT="--install_base $HOME/perl5";
-export PERL_MM_OPT="INSTALL_BASE=$HOME/perl5";
-export PERL5LIB="$HOME/perl5/lib/perl5:$PERL5LIB";
-export PATH="$HOME/perl5/bin:$PATH";
+function weather()
+{
+    # change Paris to your default location
+    local request="wttr.in/${1-52.43,0.24}"
+    [ "$(tput cols)" -lt 125 ] && request+='?n'
+    curl -H "Accept-Language: ${LANG%_*}" --compressed "$request"
+}
 
-#===============================#
-#         Python Setup          #
-#===============================#
+alias wttr=weather
 
-export PYTHONUSERBASE=$HOME/.python
-
-#=====================================================================
+#===========================================#
+#     My bash project management system     #
+#===========================================#
 
 if [ -f ~/.bash.d/apb-projects ]
 then
@@ -834,7 +881,10 @@ then
     source ~/.bash.d/apb-projects
 fi
 
-#=====================================================================
+#=======================================#
+#     Custom git command completion     #
+#=======================================#
+
 # For help on adding command completion to custom git commands see:
 #
 # https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
@@ -845,8 +895,14 @@ function _git_update_changelogs () {
     _git_rebase "$@"
 }
 
+function _git_fstat () {
+    # Just offer the same choices as 'git rebase' does.
+    _git_rebase "$@"
+}
+
 #=====================================================================
 
 # Local Variables:
 # mode: sh
 # End:
+. "$HOME/.cargo/env"

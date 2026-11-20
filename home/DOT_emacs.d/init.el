@@ -43,6 +43,13 @@
 (setq inhibit-default-init t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;           Prevent Accidental Killing Of Emacs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Don't load the 'default.el' system startup file.
+(setq confirm-kill-emacs 'yes-or-no-p)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                    Package System
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -507,7 +514,7 @@ using `abort-recursive-edit'."
   ;; Tweak the grep configuration to ignore backup files.
   (grep-apply-setting
    'grep-command
-   "grep --exclude='*~' --exclude='.#*' -IHn -e ")
+   "grep --exclude='*~' --exclude='.#*' --exclude='ChangeLog*' -IHn -e ")
   ;; Turn on highlight line in the results buffer.
   (add-hook 'grep-mode-hook (lambda () (hl-line-mode 1))))
 
@@ -852,7 +859,10 @@ using `abort-recursive-edit'."
   (setq notmuch-fcc-dirs "outbox")
   (setq notmuch-search-oldest-first nil)
   (setq notmuch-hello-sections andrew/notmuch-hello-sections)
-  (andrew/notmuch-load-additional-searches))
+  (setq notmuch-archive-tags '("-inbox" "+archived"))
+  (andrew/notmuch-load-additional-searches)
+  (add-hook 'notmuch-message-mode-hook 'flyspell-mode)
+  (add-hook 'notmuch-message-mode-hook 'andrew-review-labels))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                      Org Mode Setup
@@ -876,6 +886,44 @@ using `abort-recursive-edit'."
 
 (when (version<= "9.2" (org-version))
   (require 'org-tempo))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                      NEWS Files
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Turn on flyspell-mode for NEWS files.
+(defun apb-setup-news-file ()
+  (interactive)
+  (when (string= (file-name-base (buffer-file-name)) "NEWS")
+    (flyspell-mode)))
+(add-hook 'find-file-hook 'apb-setup-news-file)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                   Hide \r in gdb.log Files
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun remove-dos-eol ()
+  "Do not show ^M in files containing mixed UNIX and DOS line endings."
+  (interactive)
+  (setq buffer-display-table (make-display-table))
+  (aset buffer-display-table ?\^M []))
+
+(defun fix-dos-eol-in-gdb-log ()
+  ;; Hide \r for 'gdb.log' files, or files with '=== gdb tests ==='
+  ;; near the start (within first 200 characters).
+  (if (string= (file-name-nondirectory (buffer-file-name)) "gdb.log")
+      (remove-dos-eol)
+    (if (save-excursion
+          (search-forward "=== gdb tests ===" 200 t))
+        (remove-dos-eol))))
+
+(add-hook 'find-file-hook 'fix-dos-eol-in-gdb-log)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;                      Search Settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq search-default-mode #'char-fold-to-regexp)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                      Customisation
